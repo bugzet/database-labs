@@ -1,0 +1,120 @@
+C:\Users\kubat>psql -U postgres -d postgres -h localhost -p 5432
+Password for user postgres:
+
+psql (17.6)
+WARNING: Console code page (437) differs from Windows code page (1252)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# CREATE TABLE students (
+postgres(# id SERIAL PRIMARY KEY,
+postgres(# name VARCHAR(100),
+postgres(# email VARCHAR(100),
+postgres(# faculty VARCHAR(50)
+postgres(# );
+CREATE TABLE
+postgres=# SELECT * FROM students;
+ id | name | email | faculty
+----+------+-------+---------
+(0 rows)
+
+
+postgres=# CREATE TABLE students(
+postgres(# id SERIAL PRIMARY KEY,
+postgres(# name VARCHAR(100)
+postgres(# );
+postgres=# INSERT INTO students (id, name, email, faculty) VALUES (1, 'almaz', 'almaz@example.com', 'COMSEH'), (2, 'jonny', 'jonny@example.com', 'MED'), (3, 'jennie', 'jennie@example.com', 'MAT');
+INSERT 0 3
+postgres=# \d students
+                                    Table "public.students"
+ Column  |          Type          | Collation | Nullable |               Default
+---------+------------------------+-----------+----------+--------------------------------------
+ id      | integer                |           | not null | nextval('students_id_seq'::regclass)
+ name    | character varying(100) |           |          |
+ email   | character varying(100) |           |          |
+ faculty | character varying(50)  |           |          |
+Indexes:
+    "students_pkey" PRIMARY KEY, btree (id)
+
+
+postgres=# SELECT * FROM students;
+ id |  name   |        email        | faculty
+----+---------+---------------------+---------
+  1 | almaz   | almaz@example.com   | COMSEH
+  2 | jonny   | jonny@example.com   | MED
+  3 | jennie  | jennie@example.com  | MAT
+(3 rows)
+
+
+postgres=# SELECT student_id, faculty FROM students;
+ERROR:  character with byte sequence 0xd0 0x9e in encoding "UTF8" has no equivalent in encoding "WIN1252"
+postgres=# SELECT id, faculty FROM students;
+ id | faculty
+----+---------
+  1 | COMSEH
+  2 | MED
+  3 | MAT
+(3 rows)
+
+
+postgres=# SELECT name, email FROM students WHERE name = 'jonny';
+ name  |       email
+-------+-------------------
+ jonny | jonny@example.com
+(1 row)
+
+
+postgres=# SELECT name, email FROM students ORDER BY;
+ERROR:  character with byte sequence 0xd0 0x9e in encoding "UTF8" has no equivalent in encoding "WIN1252"
+postgres=# SELECT name, email FROM students ORDER BY id;
+  name   |        email
+---------+---------------------
+ almaz   | almaz@example.com
+ jonny   | jonny@example.com
+ jennie  | jennie@example.com
+(3 rows)
+
+
+postgres=#  SELECT name, email FROM students ORDER BY email;
+  name   |        email
+---------+---------------------
+ almaz   | almaz@example.com
+ jennie  | jennie@example.com
+ jonny   | jonny@example.com
+(3 rows)
+
+
+postgres=# SELECT name, email FROM students ORDER BY faculty;
+  name   |        email
+---------+---------------------
+ almaz   | almaz@example.com
+ jennie  | jennie@example.com
+ jonny   | jonny@example.com
+(3 rows)
+
+
+postgres=# SELECT name, email FROM students LIMIT 2;
+  name   |        email
+---------+---------------------
+ almaz   | almaz@example.com
+ jonny   | jonny@example.com
+(2 rows)
+
+
+postgres=# SELECT id, name FROM students LIMIT 2;
+ id |  name
+----+---------
+  1 | almaz
+  2 | jonny
+(2 rows)
+
+
+postgres=# SELECT name, faculty FROM students WHERE faculty = 'MAT';
+ name   | faculty
+--------+---------
+ jennie | MAT
+(1 row)
+
+
+postgres=# \q
