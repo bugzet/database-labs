@@ -1,0 +1,41 @@
+C:\Users\kubat>psql "C:\Users\kubat>psql -U postgres -d postgres -h localhost -p 5432
+Password for user postgres:
+
+psql (17.6)
+WARNING: Console code page (437) differs from Windows code page (1252)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# \c
+You are now connected to database "postgres" as user "postgres".
+postgres=# CREATE DATABASE auca;
+CREATE DATABASE
+postgres=# \l
+                                             List of databases
+   Name    |  Owner   | Encoding | Locale Provider |     LC_COLLATE      |      LC_CTYPE       | Locale | ICU Rules |   Access privileges
+-----------+----------+----------+-----------------+---------------------+---------------------+--------+-----------+-----------------------
+ postgres  | postgres | UTF8     | libc            | Russian_Russia.1252 | Russian_Russia.1252 |        |           |
+ template0 | postgres | UTF8     | libc            | Russian_Russia.1252 | Russian_Russia.1252 |        |           | =c/postgres          +
+           |          |          |                 |                     |                     |        |           | postgres=CTc/postgres
+ template1 | postgres | UTF8     | libc            | Russian_Russia.1252 | Russian_Russia.1252 |        |           | =c/postgres          +
+           |          |          |                 |                     |                     |        |           | postgres=CTc/postgres
+(3 rows)
+
+postgres=# \c
+You are now connected to database "postgres" as user "postgres".
+postgres=# CREATE DATABASE cookie;
+CREATE DATABASE
+postgres=# CREATE DATABASE mirror_2;
+CREATE DATABASE
+postgres=# \c
+You are now connected to database "postgres" as user "postgres".
+postgres=# \c cookie;
+You are now connected to database "cookie" as user "postgres".
+cookie=# \c mirror_2;
+You are now connected to database "mirror_2" as user "postgres".
+mirror_2=# \c postgres;
+You are now connected to database "postgres" as user "postgres".
+postgres=# \q
+
+C:\Users\kubat>
