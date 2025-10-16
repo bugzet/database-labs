@@ -1,0 +1,231 @@
+C:\Users\kubat>psql -U postgres -d postgres -h localhost -p 5432
+Password for user postgres:
+
+psql (17.6)
+WARNING: Console code page (437) differs from Windows code page (1252)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+
+postgres=# \d
+                      List of relations
+ Schema |             Name             |   Type   |  Owner
+--------+------------------------------+----------+----------
+ public | courses                      | table    | postgres
+ public | departments                  | table    | postgres
+ public | departments_dept_id_seq      | sequence | postgres
+ public | employees                    | table    | postgres
+ public | employees_emp_id_seq         | sequence | postgres
+ public | students                     | table    | postgres
+ public | students_student_id_seq      | sequence | postgres
+ public | user_profiles                | table    | postgres
+ public | user_profiles_profile_id_seq | sequence | postgres
+ public | users                        | table    | postgres
+ public | users_user_id_seq            | sequence | postgres
+(11 rows)
+
+
+postgres=# DROP TABLE IF EXISTS users, user_profiles, employees, students, departments, courses CASCADE;
+NOTICE:  drop cascades to 0 other objects
+DROP TABLE
+
+
+postgres=# CREATE TABLE students (
+postgres(# student_id INT PRIMARY KEY,
+postgres(# name VARCHAR(100)
+postgres(# );
+CREATE TABLE
+
+postgres=# CREATE TABLE student_phones (
+postgres(# student_id INT,
+postgres(# phone_number VARCHAR(15),
+postgres(# phone_type VARCHAR(20),
+postgres(# PRIMARY KEY (student_id, phone_number),
+postgres(# FOREIGN KEY (student_id) REFERENCES students(student_id)
+postgres(# );
+CREATE TABLE
+
+
+postgres=# CREATE TABLE courses (
+postgres(# course_id INT PRIMARY KEY,
+postgres(# course_name VARCHAR(100),
+postgres(# credits INT
+postgres(# );
+CREATE TABLE
+
+
+postgres=# CREATE TABLE enrollments (
+postgres(# student_id INT,
+postgres(# course_id INT,
+postgres(# grade CHAR(2),
+postgres(# PRIMARY KEY (student_id, course_id),
+postgres(# FOREIGN KEY (student_id) REFERENCES students(student_id),
+postgres(# FOREIGN KEY (course_id) REFERENCES courses(course_id)
+postgres(# );
+CREATE TABLE
+
+
+postgres=# CREATE TABLE departments (
+postgres(# department_id INT PRIMARY KEY,
+postgres(# department_name VARCHAR(100),
+postgres(# department_head VARCHAR(100)
+postgres(# );
+CREATE TABLE
+
+
+postgres=# CREATE TABLE students (
+postgres(# student_id INT PRIMARY KEY,
+postgres(# name VARCHAR(100),
+postgres(# department_id INT,
+postgres(# FOREIGN KEY (department_id) REFERENCES departments(department_id)
+postgres(# );
+CREATE TABLE
+
+
+postgres=# SELECT * FROM students;
+ student_id | name | department_id
+------------+------+---------------
+(0 rows)
+
+
+postgres=# SELECT * FROM departments;
+ department_id | department_name | department_head
+---------------+-----------------+-----------------
+(0 rows)
+
+
+postgres=# DROP TABLE IF EXISTS students, departments CASCADE;
+DROP TABLE
+
+
+postgres=# CREATE TABLE authors (
+postgres(# author_id SERIAL PRIMARY KEY,
+postgres(# first_name VARCHAR(50) NOT NULL,
+postgres(# last_name VARCHAR(50) NOT NULL,
+postgres(# birth_date DATE
+postgres(# );
+CREATE TABLE
+
+
+postgres=# CREATE TABLE books (
+postgres(# book_id SERIAL PRIMARY KEY,
+postgres(# title VARCHAR(200) NOT NULL,
+postgres(# isbn VARCHAR(13) UNIQUE,
+postgres(# publication_year INTEGER,
+postgres(# available_copies INTEGER DEFAULT 1
+postgres(# );
+CREATE TABLE
+
+
+postgres=# CREATE TABLE book_authors (
+postgres(# book_id INTEGER,
+postgres(# author_id INTEGER,
+postgres(# PRIMARY KEY (book_id, author_id),
+postgres(# FOREIGN KEY (book_id) REFERENCES books(book_id),
+postgres(# FOREIGN KEY (author_id) REFERENCES authors(author_id)
+postgres(# );
+CREATE TABLE
+
+
+postgres=# CREATE TABLE members (
+postgres(# member_id SERIAL PRIMARY KEY,
+postgres(# first_name VARCHAR(50) NOT NULL,
+postgres(# last_name VARCHAR(50) NOT NULL,
+postgres(# email VARCHAR(100) UNIQUE NOT NULL,
+postgres(# phone VARCHAR(15),
+postgres(# membership_date DATE DEFAULT CURRENT_DATE
+postgres(# );
+CREATE TABLE
+
+
+postgres=# CREATE TABLE loans (
+postgres(# loan_id SERIAL PRIMARY KEY,
+postgres(# member_id INTEGER NOT NULL,
+postgres(# book_id INTEGER NOT NULL,
+postgres(# loan_date DATE DEFAULT CURRENT_DATE,
+postgres(# due_date DATE NOT NULL,
+postgres(# return_date DATE,
+postgres(# late_fee DECIMAL(10,2) DEFAULT 0.00,
+postgres(# FOREIGN KEY (member_id) REFERENCES members(member_id),
+postgres(# FOREIGN KEY (book_id) REFERENCES books(book_id)
+postgres(# );
+CREATE TABLE
+
+
+postgres=# \d
+                  List of relations
+ Schema |         Name          |   Type   |  Owner
+--------+-----------------------+----------+----------
+ public | authors               | table    | postgres
+ public | authors_author_id_seq | sequence | postgres
+ public | book_authors          | table    | postgres
+ public | books                 | table    | postgres
+ public | books_book_id_seq     | sequence | postgres
+ public | loans                 | table    | postgres
+ public | loans_loan_id_seq     | sequence | postgres
+ public | members               | table    | postgres
+ public | members_member_id_seq | sequence | postgres
+(9 rows)
+
+
+postgres=# INSERT INTO authors (first_name, last_name, birth_date) VALUES
+postgres-# ('George', 'Orwell', '1903-06-25'),
+postgres-# ('Jane', 'Austen', '1775-12-16'),
+postgres-# ('Fyodor', 'Dostoevsky', '1821-11-11');
+INSERT 0 3
+
+postgres=# INSERT INTO books (title, isbn, publication_year, available_copies) VALUES
+postgres-# ('1984', '9780451524935', 1949, 5),
+postgres-# ('Pride and Prejudice', '9781503290563', 1813, 3),
+postgres-# ('Crime and Punishment', '9780486415871', 1866, 4);
+INSERT 0 3
+
+postgres=# INSERT INTO book_authors (book_id, author_id) VALUES
+postgres-# (1, 1),
+postgres-# (2, 2),
+postgres-# (3, 3);
+INSERT 0 3
+
+postgres=# INSERT INTO members (first_name, last_name, email, phone) VALUES
+postgres-# ('Aigerim', 'Zamirbekova', 'aigerim@example.com', '+996555000001'),
+postgres-# ('Kubat', 'Tursunov', 'kubat@example.com', '+996555000002');
+INSERT 0 2
+
+postgres=# INSERT INTO loans (member_id, book_id, due_date, return_date, late_fee) VALUES
+postgres-# (1, 1, '2025-10-25', NULL, 0.00),
+postgres-# (2, 2, '2025-10-28', NULL, 0.00);
+INSERT 0 2
+
+postgres=# SELECT m.first_name || ' ' || m.last_name AS member,
+postgres-#        b.title,
+postgres-#        l.loan_date,
+postgres-#        l.due_date,
+postgres-#        l.return_date
+postgres-# FROM members m
+postgres-# JOIN loans l ON m.member_id = l.member_id
+postgres-# JOIN books b ON l.book_id = b.book_id
+postgres-# ORDER BY m.member_id;
+      member       |         title          |  loan_date  |  due_date   | return_date
+-------------------+------------------------+-------------+-------------+-------------
+ Aigerim Zamirbekova | 1984                 | 2025-10-16  | 2025-10-25  |
+ Kubat Tursunov      | Pride and Prejudice  | 2025-10-16  | 2025-10-28  |
+(2 rows)
+
+
+postgres=# SELECT a.first_name || ' ' || a.last_name AS author,
+postgres-#        b.title,
+postgres-#        b.publication_year
+postgres-# FROM authors a
+postgres-# JOIN book_authors ba ON a.author_id = ba.author_id
+postgres-# JOIN books b ON ba.book_id = b.book_id
+postgres-# ORDER BY b.publication_year;
+       author        |         title          | publication_year
+---------------------+------------------------+------------------
+ Jane Austen         | Pride and Prejudice    |             1813
+ Fyodor Dostoevsky   | Crime and Punishment   |             1866
+ George Orwell       | 1984                   |             1949
+(3 rows)
+
+
+postgres=# \q
