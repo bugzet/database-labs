@@ -1,0 +1,277 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+PS C:\Users\kubat> cd "C:\Program Files\PostgreSQL\17\bin"
+PS C:\Program Files\PostgreSQL\17\bin> psql -U postgres
+Password for user postgres:
+
+psql (17.6)
+WARNING: Console code page (437) differs from Windows code page (1252)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# CREATE TABLE employees (
+postgres(#     id SERIAL PRIMARY KEY,
+postgres(#     first_name VARCHAR(50),
+postgres(#     last_name VARCHAR(50),
+postgres(#     department VARCHAR(50),
+postgres(#     salary NUMERIC(10,2),
+postgres(#     age INT,
+postgres(#     bonus NUMERIC(10,2),
+postgres(#     hire_date DATE,
+postgres(#     experience_years INT,
+postgres(#     email VARCHAR(100)
+postgres(# );
+CREATE TABLE
+
+postgres=# CREATE TABLE products (
+postgres(#     product_id SERIAL PRIMARY KEY,
+postgres(#     product_name VARCHAR(100),
+postgres(#     category VARCHAR(50),
+postgres(#     price NUMERIC(10,2)
+postgres(# );
+CREATE TABLE
+
+postgres=# CREATE TABLE product_reviews (
+postgres(#     review_id SERIAL PRIMARY KEY,
+postgres(#     product_id INT REFERENCES products(product_id),
+postgres(#     rating NUMERIC(2,1),
+postgres(#     review_text TEXT
+postgres(# );
+CREATE TABLE
+
+postgres=# CREATE TABLE sales_data (
+postgres(#     sale_id SERIAL PRIMARY KEY,
+postgres(#     department VARCHAR(50),
+postgres(#     sales_amount NUMERIC(10,2)
+postgres(# );
+CREATE TABLE
+
+postgres=# CREATE TABLE employee_skills (
+postgres(#     id SERIAL PRIMARY KEY,
+postgres(#     employee_id INT REFERENCES employees(id),
+postgres(#     skill_name VARCHAR(50)
+postgres(# );
+CREATE TABLE
+
+postgres=# INSERT INTO employees (first_name, last_name, department, salary, age, bonus, hire_date, experience_years, email)
+postgres-# VALUES
+postgres-# ('Nurbek', 'Sadykov', 'Finance', 91000, 31, 5200, '2021-02-19', 7, 'nurbek@company.com'),
+postgres-# ('Altynai', 'Kadyrova', 'Engineering', 128000, 38, 8700, '2016-06-23', 14, 'altynai@company.com'),
+postgres-# ('Bakyt', 'Tursunov', 'Marketing', 78000, 27, 4600, '2020-09-18', 5, 'bakyt@company.com'),
+postgres-# ('Madina', 'Abdullaeva', 'Sales', 71000, 42, 3800, '2015-01-11', 17, 'madina@company.com'),
+postgres-# ('Emir', 'Bekbolotov', 'HR', 62000, 24, NULL, '2023-03-08', 2, NULL);
+INSERT 0 5
+
+postgres=# INSERT INTO products (product_name, category, price)
+postgres-# VALUES
+postgres-# ('Printer', 'Electronics', 280.00),
+postgres-# ('Scanner', 'Electronics', 190.00),
+postgres-# ('Desk', 'Furniture', 350.00),
+postgres-# ('Office Chair', 'Furniture', 160.00);
+INSERT 0 4
+
+postgres=# INSERT INTO product_reviews (product_id, rating)
+postgres-# VALUES
+postgres-# (1, 4.9),
+postgres-# (2, 4.3),
+postgres-# (3, 4.6),
+postgres-# (3, 4.8),
+postgres-# (4, 4.4);
+INSERT 0 5
+
+postgres=# INSERT INTO sales_data (department, sales_amount)
+postgres-# VALUES
+postgres-# ('Finance', 132000),
+postgres-# ('Engineering', 175000),
+postgres-# ('Marketing', 89000),
+postgres-# ('Sales', 116000);
+INSERT 0 4
+
+postgres=# INSERT INTO employee_skills (employee_id, skill_name)
+postgres-# VALUES
+postgres-# (1, 'Excel'),
+postgres-# (1, 'Data Analysis'),
+postgres-# (2, 'C++'),
+postgres-# (2, 'Kubernetes'),
+postgres-# (3, 'Social Media'),
+postgres-# (4, 'Customer Relations');
+INSERT 0 6
+
+postgres=# SELECT COUNT(*) AS total_employees
+postgres-# FROM employees;
+ total_employees
+-----------------
+               5
+(1 row)
+
+
+postgres=# SELECT COUNT(email) AS employees_with_email
+postgres-# FROM employees;
+ employees_with_email
+----------------------
+                    4
+(1 row)
+
+
+postgres=# SELECT COUNT(DISTINCT department) AS unique_departments
+postgres-# FROM employees;
+ unique_departments
+--------------------
+                  5
+(1 row)
+
+
+postgres=# SELECT SUM(salary) AS total_salaries
+postgres-# FROM employees;
+ total_salaries
+----------------
+      430000.00
+(1 row)
+
+
+postgres=# SELECT department, SUM(sales_amount) AS total_sales
+postgres-# FROM sales_data
+postgres-# GROUP BY department;
+ department  | total_sales
+-------------+-------------
+ Finance     |   132000.00
+ Engineering |   175000.00
+ Marketing   |    89000.00
+ Sales       |   116000.00
+(4 rows)
+
+
+postgres=# SELECT AVG(salary) AS average_salary
+postgres-# FROM employees;
+   average_salary
+--------------------
+ 86000.000000000000
+(1 row)
+
+
+postgres=# SELECT department, AVG(age) AS avg_age
+postgres-# FROM employees
+postgres-# GROUP BY department;
+ department  |       avg_age
+-------------+---------------------
+ Finance     | 31.0000000000000000
+ Engineering | 38.0000000000000000
+ Marketing   | 27.0000000000000000
+ Sales       | 42.0000000000000000
+ HR          | 24.0000000000000000
+(5 rows)
+
+
+postgres=# SELECT
+postgres-#     MAX(salary) AS highest_salary,
+postgres-#     MIN(salary) AS lowest_salary
+postgres-# FROM employees;
+ highest_salary | lowest_salary
+----------------+---------------
+      128000.00 |      62000.00
+(1 row)
+
+
+postgres=# SELECT department, MAX(hire_date) AS latest_hire
+postgres-# FROM employees
+postgres-# GROUP BY department;
+ department  | latest_hire
+-------------+-------------
+ Finance     | 2021-02-19
+ Engineering | 2016-06-23
+ Marketing   | 2020-09-18
+ Sales       | 2015-01-11
+ HR          | 2023-03-08
+(5 rows)
+
+
+postgres=# SELECT department, STRING_AGG(first_name, ', ') AS employee_names
+postgres-# FROM employees
+postgres-# GROUP BY department;
+ department  |   employee_names
+-------------+----------------------
+ Finance     | Nurbek
+ Engineering | Altynai
+ Marketing   | Bakyt
+ Sales       | Madina
+ HR          | Emir
+(5 rows)
+
+
+postgres=# SELECT employee_id, STRING_AGG(skill_name, ', ' ORDER BY skill_name) AS skills
+postgres-# FROM employee_skills
+postgres-# GROUP BY employee_id;
+ employee_id |          skills
+-------------+---------------------------
+           1 | Data Analysis, Excel
+           2 | C++, Kubernetes
+           3 | Social Media
+           4 | Customer Relations
+(4 rows)
+
+
+postgres=# SELECT department, ARRAY_AGG(salary) AS salary_array
+postgres-# FROM employees
+postgres-# GROUP BY department;
+ department  |     salary_array
+-------------+----------------------
+ Finance     | {91000.00}
+ Engineering | {128000.00}
+ Marketing   | {78000.00}
+ Sales       | {71000.00}
+ HR          | {62000.00}
+(5 rows)
+
+
+postgres=# SELECT
+postgres-#     category,
+postgres-#     COUNT(*) AS number_of_products,
+postgres-#     SUM(price) AS total_value,
+postgres-#     AVG(price) AS average_price
+postgres-# FROM products
+postgres-# GROUP BY category;
+  category   | number_of_products | total_value |    average_price
+-------------+--------------------+-------------+---------------------
+ Electronics |                  2 |      470.00 | 235.0000000000000000
+ Furniture   |                  2 |      510.00 | 255.0000000000000000
+(2 rows)
+
+
+postgres=# SELECT
+postgres-#     CASE
+postgres-#         WHEN age < 30 THEN 'Under 30'
+postgres-#         WHEN age BETWEEN 30 AND 50 THEN '30-50'
+postgres-#         ELSE 'Over 50'
+postgres-#     END AS age_group,
+postgres-#     COUNT(*) AS employee_count,
+postgres-#     AVG(salary) AS avg_salary
+postgres-# FROM employees
+postgres-# GROUP BY
+postgres-#     CASE
+postgres-#         WHEN age < 30 THEN 'Under 30'
+postgres-#         WHEN age BETWEEN 30 AND 50 THEN '30-50'
+postgres-#         ELSE 'Over 50'
+postgres-#     END;
+ age_group | employee_count |     avg_salary
+-----------+----------------+--------------------
+ Under 30  |              2 | 70000.000000000000
+ 30-50     |              3 | 96666.666666666667
+(2 rows)
+
+
+postgres=# SELECT
+postgres-#     SUM(bonus) AS total_bonus,
+postgres-#     AVG(bonus) AS avg_bonus,
+postgres-#     COUNT(bonus) AS employees_with_bonus
+postgres-# FROM employees;
+ total_bonus |       avg_bonus       | employees_with_bonus
+-------------+-----------------------+----------------------
+    22300.00 | 5575.0000000000000000 |                    4
+(1 row)
+
+
+postgres=#
