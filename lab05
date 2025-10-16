@@ -1,0 +1,103 @@
+C:\Users\kubat>psql -U postgres -d postgres -h localhost -p 5432
+Password for user postgres:
+
+psql (17.6)
+WARNING: Console code page (437) differs from Windows code page (1252)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# \c
+You are now connected to database "postgres" as user "postgres".
+postgres=# \c mirror_2;
+You are now connected to database "mirror_2" as user "postgres".
+
+mirror_2=# CREATE TABLE students (
+mirror_2(#     student_id SERIAL PRIMARY KEY,
+mirror_2(#     name VARCHAR(100) NOT NULL,
+mirror_2(#     email VARCHAR(150) UNIQUE,
+mirror_2(#     faculty VARCHAR(50)
+mirror_2(# );
+CREATE TABLE
+
+mirror_2=# INSERT INTO students (name, email, faculty) VALUES
+mirror_2-# ('Kubat Tursunov', 'kubat@auca.kg', 'Software Engineering'),
+mirror_2-# ('Aigerim Zamirbekova', 'aigerim@auca.kg', 'Economics'),
+mirror_2-# ('Maksat Toktobaev', 'maksat@auca.kg', 'Computer Science');
+INSERT 0 3
+
+mirror_2=# SELECT * FROM students;
+ student_id |       name        |        email        |       faculty
+------------+-------------------+---------------------+-----------------------
+          1 | Kubat Tursunov    | kubat@auca.kg       | Software Engineering
+          2 | Aigerim Zamirbekova | aigerim@auca.kg   | Economics
+          3 | Maksat Toktobaev  | maksat@auca.kg      | Computer Science
+(3 rows)
+
+
+mirror_2=# CREATE TABLE course_enrollments (
+mirror_2(#     student_id INTEGER,
+mirror_2(#     course_id INTEGER,
+mirror_2(#     semester VARCHAR(20),
+mirror_2(#     enrollment_date DATE DEFAULT CURRENT_DATE,
+mirror_2(#     grade CHAR(2),
+mirror_2(#     PRIMARY KEY (student_id, course_id, semester)
+mirror_2(# );
+CREATE TABLE
+
+mirror_2=# INSERT INTO course_enrollments (student_id, course_id, semester, grade) VALUES
+mirror_2-# (1, 101, '2024-Spring', 'A'),
+mirror_2-# (1, 102, '2024-Fall', 'A+'),
+mirror_2-# (2, 103, '2024-Spring', 'B+'),
+mirror_2-# (3, 101, '2024-Fall', 'A-');
+INSERT 0 4
+
+mirror_2=# SELECT * FROM course_enrollments;
+ student_id | course_id |  semester   | enrollment_date | grade
+------------+-----------+-------------+-----------------+-------
+          1 |       101 | 2024-Spring | 2025-10-16      | A
+          1 |       102 | 2024-Fall   | 2025-10-16      | A+
+          2 |       103 | 2024-Spring | 2025-10-16      | B+
+          3 |       101 | 2024-Fall   | 2025-10-16      | A-
+(4 rows)
+
+
+mirror_2=# CREATE TABLE products (
+mirror_2(#     product_id SERIAL PRIMARY KEY,
+mirror_2(#     product_name VARCHAR(100) NOT NULL,
+mirror_2(#     price DECIMAL(10,2)
+mirror_2(# );
+CREATE TABLE
+
+mirror_2=# INSERT INTO products (product_name, price) VALUES
+mirror_2-# ('Wireless Mouse', 25.50),
+mirror_2-# ('Mechanical Keyboard', 79.99),
+mirror_2-# ('Gaming Headset', 59.00);
+INSERT 0 3
+
+mirror_2=# SELECT * FROM products;
+ product_id |    product_name    | price
+------------+--------------------+--------
+          1 | Wireless Mouse     |  25.50
+          2 | Mechanical Keyboard|  79.99
+          3 | Gaming Headset     |  59.00
+(3 rows)
+
+
+mirror_2=# CREATE TABLE transactions (
+mirror_2(#     transaction_id BIGSERIAL PRIMARY KEY,
+mirror_2(#     amount DECIMAL(15,2),
+mirror_2(#     transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+mirror_2(# );
+CREATE TABLE
+
+mirror_2=# INSERT INTO transactions (amount) VALUES
+mirror_2-# (150.00),
+mirror_2-# (89.99),
+mirror_2-# (320.50);
+INSERT 0 3
+
+mirror_2=# SELECT * FROM transactions;
+ transaction_id | amount  |       transaction_date
+----------------+---------+-------------------------------
+              1 | 150.00  | 2025-
