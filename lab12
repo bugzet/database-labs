@@ -1,0 +1,256 @@
+PS C:\Users\kubat> cd "C:\Program Files\PostgreSQL\17\bin"
+PS C:\Program Files\PostgreSQL\17\bin> psql -U postgres
+Password for user postgres:
+
+psql (17.6)
+WARNING: Console code page (437) differs from Windows code page (1252)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# \dt
+           List of relations
+ Schema |   Name    | Type  |  Owner
+--------+-----------+-------+----------
+ public | customers | table | postgres
+ public | orders    | table | postgres
+(2 rows)
+
+
+postgres=# CREATE TABLE customers (
+postgres(#     customer_id SERIAL PRIMARY KEY,
+postgres(#     name VARCHAR(100),
+postgres(#     email VARCHAR(100)
+postgres(# );
+CREATE TABLE
+postgres=# INSERT INTO customers (name, email) VALUES
+postgres-# ('Aibek Eraliev', 'aibek@mail.com'),
+postgres-# ('Meerim Sadykova', 'meerim@mail.com'),
+postgres-# ('Ruslan Tokoev', 'ruslan@company.com'),
+postgres-# ('Aizada Bekova', 'aizada@mail.com'),
+postgres-# ('Tilek Muratov', 'tilek@company.com'),
+postgres-# ('Dana Uulu', 'dana@mail.com');
+INSERT 0 6
+postgres=# CREATE TABLE orders (
+postgres(#     order_id SERIAL PRIMARY KEY,
+postgres(#     customer_id INT REFERENCES customers(customer_id),
+postgres(#     order_date DATE,
+postgres(#     total_amount DECIMAL(8,2)
+postgres(# );
+CREATE TABLE
+postgres=# INSERT INTO orders (customer_id, order_date, total_amount) VALUES
+postgres-# (1, '2025-01-15', 300.50),
+postgres-# (1, '2025-03-10', 125.00),
+postgres-# (2, '2025-04-05', 420.75),
+postgres-# (3, '2025-05-20', 180.00),
+postgres-# (5, '2025-07-18', 510.00);
+INSERT 0 5
+postgres=# CREATE TABLE products (
+postgres(#     product_id SERIAL PRIMARY KEY,
+postgres(#     product_name VARCHAR(100),
+postgres(#     price DECIMAL(8,2)
+postgres(# );
+CREATE TABLE
+postgres=# INSERT INTO products (product_name, price) VALUES
+postgres-# ('Tablet', 600.00),
+postgres-# ('Smartwatch', 250.00),
+postgres-# ('Wireless Earbuds', 120.00),
+postgres-# ('Desk Lamp', 75.00),
+postgres-# ('Office Chair', 200.00);
+INSERT 0 5
+postgres=# CREATE TABLE order_items (
+postgres(#     order_item_id SERIAL PRIMARY KEY,
+postgres(#     order_id INT REFERENCES orders(order_id),
+postgres(#     product_id INT REFERENCES products(product_id),
+postgres(#     quantity INT
+postgres(# );
+CREATE TABLE
+postgres=# INSERT INTO order_items (order_id, product_id, quantity) VALUES
+postgres-# (1, 1, 1),
+postgres-# (1, 3, 2),
+postgres-# (2, 2, 1),
+postgres-# (3, 5, 2),
+postgres-# (4, 4, 1),
+postgres-# (5, 1, 1),
+postgres-# (5, 2, 2);
+INSERT 0 7
+postgres=# CREATE TABLE employees (
+postgres(#     employee_id SERIAL PRIMARY KEY,
+postgres(#     name VARCHAR(100),
+postgres(#     manager_id INT REFERENCES employees(employee_id)
+postgres(# );
+CREATE TABLE
+postgres=# INSERT INTO employees (employee_id, name, manager_id) VALUES
+postgres-# (1, 'Kubat Manager', NULL),
+postgres-# (2, 'Nurlan Assistant', 1),
+postgres-# (3, 'Asel Developer', 1),
+postgres-# (4, 'Bakyt Intern', 2);
+INSERT 0 4
+postgres=# CREATE TABLE users (
+postgres(#     user_id SERIAL PRIMARY KEY,
+postgres(#     username VARCHAR(50)
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE user_profiles (
+postgres(#     profile_id SERIAL PRIMARY KEY,
+postgres(#     user_id INT REFERENCES users(user_id),
+postgres(#     first_name VARCHAR(50),
+postgres(#     last_name VARCHAR(50),
+postgres(#     phone VARCHAR(20)
+postgres(# );
+CREATE TABLE
+postgres=# INSERT INTO users (username) VALUES
+postgres-# ('nurlan_user'), ('aibek_user'), ('aizada_user');
+INSERT 0 3
+postgres=# INSERT INTO user_profiles (user_id, first_name, last_name, phone) VALUES
+postgres-# (1, 'Nurlan', 'Osmonov', '555-1001'),
+postgres-# (2, 'Aibek', 'Eraliev', '555-2034');
+INSERT 0 2
+postgres=# CREATE TABLE authors (
+postgres(#     author_id SERIAL PRIMARY KEY,
+postgres(#     author_name VARCHAR(100)
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE books (
+postgres(#     book_id SERIAL PRIMARY KEY,
+postgres(#     author_id INT REFERENCES authors(author_id),
+postgres(#     title VARCHAR(100),
+postgres(#     publication_year INT
+postgres(# );
+CREATE TABLE
+postgres=# INSERT INTO authors (author_name) VALUES
+postgres-# ('Chyngyz Aitmatov'),
+postgres-# ('Gabriel Garcia Marquez'),
+postgres-# ('Fyodor Dostoevsky');
+INSERT 0 3
+postgres=# INSERT INTO books (author_id, title, publication_year) VALUES
+postgres-# (1, 'The Day Lasts More Than a Hundred Years', 1980),
+postgres-# (1, 'Jamila', 1958),
+postgres-# (2, 'One Hundred Years of Solitude', 1967),
+postgres-# (3, 'Crime and Punishment', 1866),
+postgres-# (3, 'The Idiot', 1869);
+INSERT 0 5
+postgres=# CREATE TABLE students (
+postgres(#     student_id SERIAL PRIMARY KEY,
+postgres(#     student_name VARCHAR(100)
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE courses (
+postgres(#     course_id SERIAL PRIMARY KEY,
+postgres(#     course_name VARCHAR(100)
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE enrollments (
+postgres(#     enrollment_id SERIAL PRIMARY KEY,
+postgres(#     student_id INT REFERENCES students(student_id),
+postgres(#     course_id INT REFERENCES courses(course_id),
+postgres(#     enrollment_date DATE,
+postgres(#     grade DECIMAL(3,1)
+postgres(# );
+CREATE TABLE
+postgres=# INSERT INTO students (student_name) VALUES
+postgres-# ('Adilet Muratov'), ('Meerim Kasymova'), ('Nurzhan Esenov');
+INSERT 0 3
+postgres=# INSERT INTO courses (course_name) VALUES
+postgres-# ('Database Systems'), ('Algorithms'), ('Machine Learning');
+INSERT 0 3
+postgres=# INSERT INTO enrollments (student_id, course_id, enrollment_date, grade) VALUES
+postgres-# (1, 1, '2025-02-05', 4.7),
+postgres-# (1, 3, '2025-03-22', 4.9),
+postgres-# (2, 2, '2025-02-15', NULL),
+postgres-# (3, 1, '2025-04-10', 4.3);
+INSERT 0 4
+postgres=# SELECT c.name, c.email, o.order_date, o.total_amount
+postgres-# FROM customers c
+postgres-# INNER JOIN orders o ON c.customer_id = o.customer_id;
+       name       |        email        | order_date | total_amount
+------------------+---------------------+------------+--------------
+ Aibek Eraliev    | aibek@mail.com      | 2025-01-15 |       300.50
+ Aibek Eraliev    | aibek@mail.com      | 2025-03-10 |       125.00
+ Meerim Sadykova  | meerim@mail.com     | 2025-04-05 |       420.75
+ Ruslan Tokoev    | ruslan@company.com  | 2025-05-20 |       180.00
+ Tilek Muratov    | tilek@company.com   | 2025-07-18 |       510.00
+(5 rows)
+
+
+postgres=# SELECT c.name, c.email, o.order_date, o.total_amount
+postgres-# FROM customers c
+postgres-# LEFT JOIN orders o ON c.customer_id = o.customer_id;
+       name       |        email        | order_date | total_amount
+------------------+---------------------+------------+--------------
+ Aibek Eraliev    | aibek@mail.com      | 2025-01-15 |       300.50
+ Aibek Eraliev    | aibek@mail.com      | 2025-03-10 |       125.00
+ Meerim Sadykova  | meerim@mail.com     | 2025-04-05 |       420.75
+ Ruslan Tokoev    | ruslan@company.com  | 2025-05-20 |       180.00
+ Tilek Muratov    | tilek@company.com   | 2025-07-18 |       510.00
+ Dana Uulu        | dana@mail.com       |            |
+(6 rows)
+
+
+postgres=# SELECT c.name, o.order_date, oi.quantity, p.product_name, p.price
+postgres-# FROM customers c
+postgres-# INNER JOIN orders o ON c.customer_id = o.customer_id
+postgres-# INNER JOIN order_items oi ON o.order_id = oi.order_id
+postgres-# INNER JOIN products p ON oi.product_id = p.product_id;
+       name       | order_date | quantity |   product_name    |  price
+------------------+------------+----------+-------------------+---------
+ Aibek Eraliev    | 2025-01-15 |        1 | Tablet            |  600.00
+ Aibek Eraliev    | 2025-01-15 |        2 | Wireless Earbuds  |  120.00
+ Aibek Eraliev    | 2025-03-10 |        1 | Smartwatch        |  250.00
+ Meerim Sadykova  | 2025-04-05 |        2 | Office Chair      |  200.00
+ Ruslan Tokoev    | 2025-05-20 |        1 | Desk Lamp         |   75.00
+ Tilek Muratov    | 2025-07-18 |        1 | Tablet            |  600.00
+ Tilek Muratov    | 2025-07-18 |        2 | Smartwatch        |  250.00
+(7 rows)
+
+
+postgres=# SELECT u.username, up.first_name, up.last_name, up.phone
+postgres-# FROM users u
+postgres-# LEFT JOIN user_profiles up ON u.user_id = up.user_id;
+   username    | first_name | last_name |  phone
+---------------+------------+-----------+----------
+ nurlan_user   | Nurlan     | Osmonov   | 555-1001
+ aibek_user    | Aibek      | Eraliev   | 555-2034
+ aizada_user   |            |           |
+(3 rows)
+
+
+postgres=# SELECT a.author_name, b.title, b.publication_year
+postgres-# FROM authors a
+postgres-# INNER JOIN books b ON a.author_id = b.author_id
+postgres-# ORDER BY a.author_name, b.publication_year;
+       author_name        |                 title                  | publication_year
+---------------------------+---------------------------------------+------------------
+ Chyngyz Aitmatov          | Jamila                                |             1958
+ Chyngyz Aitmatov          | The Day Lasts More Than a Hundred Years|             1980
+ Fyodor Dostoevsky         | Crime and Punishment                  |             1866
+ Fyodor Dostoevsky         | The Idiot                             |             1869
+ Gabriel Garcia Marquez    | One Hundred Years of Solitude         |             1967
+(5 rows)
+
+
+postgres=# SELECT s.student_name, c.course_name, e.enrollment_date, e.grade
+postgres-# FROM students s
+postgres-# INNER JOIN enrollments e ON s.student_id = e.student_id
+postgres-# INNER JOIN courses c ON e.course_id = c.course_id
+postgres-# WHERE e.grade IS NOT NULL
+postgres-# ORDER BY s.student_name, c.course_name;
+  student_name  |   course_name    | enrollment_date | grade
+----------------+------------------+-----------------+-------
+ Adilet Muratov | Database Systems | 2025-02-05      |   4.7
+ Adilet Muratov | Machine Learning | 2025-03-22      |   4.9
+ Nurzhan Esenov | Database Systems | 2025-04-10      |   4.3
+(3 rows)
+
+
+postgres=# SELECT c.name
+postgres-# FROM customers c
+postgres-# LEFT JOIN orders o ON c.customer_id = o.customer_id
+postgres-# WHERE o.customer_id IS NULL;
+    name
+-------------
+ Dana Uulu
+(1 row)
+
+
+postgres=#
