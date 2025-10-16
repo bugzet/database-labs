@@ -1,0 +1,263 @@
+PS C:\Users\kubat> cd "C:\Program Files\PostgreSQL\17\bin"
+PS C:\Program Files\PostgreSQL\17\bin> psql -U postgres
+Password for user postgres:
+
+psql (17.6)
+WARNING: Console code page (437) differs from Windows code page (1252)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# CREATE DATABASE retail_db;
+CREATE DATABASE
+postgres=# \c retail_db;
+You are now connected to database "retail_db" as user "postgres".
+
+retail_db=# CREATE TABLE employees (
+retail_db(#     id SERIAL PRIMARY KEY,
+retail_db(#     name VARCHAR(100),
+retail_db(#     department VARCHAR(50),
+retail_db(#     salary NUMERIC(10,2)
+retail_db(# );
+CREATE TABLE
+
+retail_db=# CREATE TABLE products (
+retail_db(#     id SERIAL PRIMARY KEY,
+retail_db(#     product_name VARCHAR(100),
+retail_db(#     price NUMERIC(10,2)
+retail_db(# );
+CREATE TABLE
+
+retail_db=# CREATE TABLE customers (
+retail_db(#     id SERIAL PRIMARY KEY,
+retail_db(#     customer_name VARCHAR(100),
+retail_db(#     email VARCHAR(100)
+retail_db(# );
+CREATE TABLE
+
+retail_db=# CREATE TABLE users (
+retail_db(#     id SERIAL PRIMARY KEY,
+retail_db(#     email VARCHAR(100)
+retail_db(# );
+CREATE TABLE
+
+retail_db=# CREATE TABLE sales (
+retail_db(#     id SERIAL PRIMARY KEY,
+retail_db(#     employee_id INT REFERENCES employees(id),
+retail_db(#     amount NUMERIC(10,2)
+retail_db(# );
+CREATE TABLE
+
+retail_db=# INSERT INTO employees (name, department, salary) VALUES
+retail_db-# ('Nurlan', 'Logistics', 87000),
+retail_db-# ('Aigerim', 'Finance', 115000),
+retail_db-# ('Bekzat', 'Sales', 76000),
+retail_db-# ('Dana', 'HR', 65000),
+retail_db-# ('Timur', 'Marketing', 94000);
+INSERT 0 5
+
+retail_db=# INSERT INTO products (product_name, price) VALUES
+retail_db-# ('Laptop', 950.00),
+retail_db-# ('Smartphone', 750.00),
+retail_db-# ('Headphones', 120.00),
+retail_db-# ('Monitor', 320.00);
+INSERT 0 4
+
+retail_db=# INSERT INTO customers (customer_name, email) VALUES
+retail_db-# ('Kanykei', 'kanykei@mail.com'),
+retail_db-# ('Askar', 'askar@gmail.com'),
+retail_db-# ('Nazira', 'nazira@outlook.com'),
+retail_db-# ('Adilet', 'adilet@yahoo.com');
+INSERT 0 4
+
+retail_db=# INSERT INTO users (email) VALUES
+retail_db-# ('aliya@gmail.com'),
+retail_db-# ('amir@hotmail.com'),
+retail_db-# ('saltanat@gmail.com');
+INSERT 0 3
+
+retail_db=# INSERT INTO sales (employee_id, amount) VALUES
+retail_db-# (1, 950),
+retail_db-# (2, 1450),
+retail_db-# (3, 1180),
+retail_db-# (5, 650);
+INSERT 0 4
+
+retail_db=# SELECT * FROM employees;
+ id |  name   | department |  salary
+----+---------+-------------+-----------
+  1 | Nurlan  | Logistics   |  87000.00
+  2 | Aigerim | Finance     | 115000.00
+  3 | Bekzat  | Sales       |  76000.00
+  4 | Dana    | HR          |  65000.00
+  5 | Timur   | Marketing   |  94000.00
+(5 rows)
+
+
+retail_db=# SELECT name, department FROM employees;
+  name   | department
+---------+-------------
+ Nurlan  | Logistics
+ Aigerim | Finance
+ Bekzat  | Sales
+ Dana    | HR
+ Timur   | Marketing
+(5 rows)
+
+
+retail_db=# SELECT name, salary, salary * 0.10 AS potential_bonus
+retail_db-# FROM employees;
+  name   |  salary   | potential_bonus
+---------+-----------+-----------------
+ Nurlan  |  87000.00 |       8700.0000
+ Aigerim | 115000.00 |      11500.0000
+ Bekzat  |  76000.00 |       7600.0000
+ Dana    |  65000.00 |       6500.0000
+ Timur   |  94000.00 |       9400.0000
+(5 rows)
+
+
+retail_db=# SELECT name, salary
+retail_db-# FROM employees
+retail_db-# WHERE department = 'Sales';
+  name  |  salary
+--------+----------
+ Bekzat | 76000.00
+(1 row)
+
+
+retail_db=# SELECT name
+retail_db-# FROM employees
+retail_db-# WHERE salary > 80000 AND department = 'Finance';
+  name
+---------
+ Aigerim
+(1 row)
+
+
+retail_db=# SELECT product_name, price
+retail_db-# FROM products
+retail_db-# WHERE price BETWEEN 100 AND 800;
+ product_name | price
+--------------+--------
+ Smartphone   | 750.00
+ Headphones   | 120.00
+ Monitor      | 320.00
+(3 rows)
+
+
+retail_db=# SELECT customer_name
+retail_db-# FROM customers
+retail_db-# WHERE customer_name LIKE 'A%';
+ customer_name
+---------------
+ Askar
+ Adilet
+(2 rows)
+
+
+retail_db=# SELECT product_name
+retail_db-# FROM products
+retail_db-# WHERE product_name LIKE '%phone';
+ product_name
+--------------
+ Smartphone
+(1 row)
+
+
+retail_db=# SELECT email
+retail_db-# FROM users
+retail_db-# WHERE email ILIKE '%@gmail.com';
+       email
+---------------------
+ aliya@gmail.com
+ saltanat@gmail.com
+(2 rows)
+
+
+retail_db=# SELECT name
+retail_db-# FROM employees
+retail_db-# WHERE name ~ '^[AT]';
+ name
+-------
+ Aigerim
+ Timur
+(2 rows)
+
+
+retail_db=# SELECT email
+retail_db-# FROM users
+retail_db-# WHERE email ~* '^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$';
+       email
+---------------------
+ aliya@gmail.com
+ amir@hotmail.com
+ saltanat@gmail.com
+(3 rows)
+
+
+retail_db=# SELECT name
+retail_db-# FROM employees
+retail_db-# WHERE id IN (SELECT employee_id FROM sales WHERE amount > 1000);
+  name
+---------
+ Aigerim
+ Bekzat
+(2 rows)
+
+
+retail_db=# SELECT name
+retail_db-# FROM employees e
+retail_db-# WHERE EXISTS (
+retail_db(#   SELECT 1
+retail_db(#   FROM sales s
+retail_db(#   WHERE s.employee_id = e.id AND s.amount > 1000
+retail_db(# );
+  name
+---------
+ Aigerim
+ Bekzat
+(2 rows)
+
+
+retail_db=# SELECT name, salary,
+retail_db-#   CASE
+retail_db-#     WHEN salary > 100000 THEN 'Senior'
+retail_db-#     WHEN salary BETWEEN 70000 AND 100000 THEN 'Mid-Level'
+retail_db-#     ELSE 'Junior'
+retail_db-#   END AS employee_level
+retail_db-# FROM employees;
+  name   |  salary   | employee_level
+---------+-----------+----------------
+ Nurlan  |  87000.00 | Mid-Level
+ Aigerim | 115000.00 | Senior
+ Bekzat  |  76000.00 | Mid-Level
+ Dana    |  65000.00 | Junior
+ Timur   |  94000.00 | Mid-Level
+(5 rows)
+
+
+retail_db=# WITH department_averages AS (
+retail_db(#   SELECT
+retail_db(#     department,
+retail_db(#     AVG(salary) AS avg_salary
+retail_db(#   FROM employees
+retail_db(#   GROUP BY department
+retail_db(# )
+retail_db-#
+retail_db-# SELECT
+retail_db-#   e.name,
+retail_db-#   e.salary,
+retail_db-#   e.department,
+retail_db-#   da.avg_salary
+retail_db-# FROM employees e
+retail_db-# JOIN department_averages da ON e.department = da.department
+retail_db-# WHERE e.salary > da.avg_salary;
+  name  |  salary   | department |     avg_salary
+--------+-----------+-------------+---------------------
+ Aigerim | 115000.00 | Finance     | 115000.000000000000
+ Timur   |  94000.00 | Marketing   |  94000.000000000000
+(2 rows)
+
+
+retail_db=#
