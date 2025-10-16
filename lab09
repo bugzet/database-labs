@@ -1,0 +1,68 @@
+PS C:\Users\kubat> cd "C:\Program Files\PostgreSQL\17\bin"
+PS C:\Program Files\PostgreSQL\17\bin> psql -U postgres
+Password for user postgres:
+
+psql (17.6)
+WARNING: Console code page (437) differs from Windows code page (1252)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# \dt
+Did not find any relations.
+postgres=# CREATE TABLE Students (
+postgres(# student_id SERIAL PRIMARY KEY,
+postgres(# first_name VARCHAR(50),
+postgres(# last_name VARCHAR(50),
+postgres(# birth_date DATE
+postgres(# );
+CREATE TABLE
+postgres=# INSERT INTO Students (first_name, last_name, birth_date)
+postgres-# VALUES ('Tilek', 'Abdyldaev', '2001-11-10');
+INSERT 0 1
+postgres=# INSERT INTO Students (first_name, last_name, birth_date) VALUES
+postgres-# ('Meerim', 'Erkinbekova', '2002-03-05'),
+postgres-# ('Ruslan', 'Kozubaev', '2003-02-28'),
+postgres-# ('Aizada', 'Tashmatova', '2002-07-14');
+INSERT 0 3
+postgres=# UPDATE Students
+postgres-# SET birth_date = '2001-11-15'
+postgres-# WHERE first_name = 'Tilek' AND last_name = 'Abdyldaev';
+UPDATE 1
+postgres=# DELETE FROM Students
+postgres-# WHERE first_name = 'Aizada' AND last_name = 'Tashmatova';
+DELETE 1
+postgres=# \d
+                   List of relations
+ Schema |          Name           |   Type   |  Owner
+--------+-------------------------+----------+----------
+ public | students                | table    | postgres
+ public | students_student_id_seq | sequence | postgres
+(2 rows)
+
+
+postgres=# SELECT * FROM students;
+ student_id | first_name |  last_name   | birth_date
+------------+------------+--------------+------------
+          2 | Meerim     | Erkinbekova  | 2002-03-05
+          3 | Ruslan     | Kozubaev     | 2003-02-28
+          1 | Tilek      | Abdyldaev    | 2001-11-15
+(3 rows)
+
+
+postgres=# UPDATE Students
+postgres-# SET last_name = 'Bekov'
+postgres-# WHERE last_name IN ('Uulu', 'Isakov');
+UPDATE 0
+postgres=# COPY Students(first_name, last_name, birth_date)
+postgres-# FROM '/path/to/students.csv'
+postgres-# DELIMITER ','
+postgres-# CSV HEADER;
+ERROR:  character with byte sequence 0xd0 0x9e in encoding "UTF8" has no equivalent in encoding "WIN1252"
+postgres=# DELETE FROM Students
+postgres-# WHERE student_id IN (2, 3, 5);
+DELETE 2
+postgres=# SELECT * FROM students;
+ student_id | first_name | last_name  | birth_date
+------------+------------+------------+------------
+          1 | Tilek      | Ab
