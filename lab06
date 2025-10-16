@@ -1,0 +1,247 @@
+C:\Users\kubat>psql -U postgres -d postgres -h localhost -p 5432
+Password for user postgres:
+
+psql (17.6)
+WARNING: Console code page (437) differs from Windows code page (1252)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# CREATE TABLE departments (
+postgres(# dept_id SERIAL PRIMARY KEY,
+postgres(# dept_name VARCHAR(100) NOT NULL,
+postgres(# location VARCHAR(100)
+postgres(# );
+CREATE TABLE
+
+postgres=# CREATE TABLE employees (
+postgres(# emp_id SERIAL PRIMARY KEY,
+postgres(# first_name VARCHAR(50) NOT NULL,
+postgres(# last_name VARCHAR(50) NOT NULL,
+postgres(# dept_id INTEGER REFERENCES departments(dept_id)
+postgres(# );
+CREATE TABLE
+
+postgres=# SELECT * FROM employees;
+ emp_id | first_name | last_name | dept_id
+--------+------------+-----------+---------
+(0 rows)
+
+
+postgres=# \dt
+                List of relations
+ Schema |        Name         | Type  |  Owner
+--------+---------------------+-------+----------
+ public | departments         | table | postgres
+ public | employees           | table | postgres
+ public | university_students | table | postgres
+(3 rows)
+
+
+postgres=# \d departments
+                                        Table "public.departments"
+   Column   |          Type          | Collation | Nullable |                   Default
+------------+------------------------+-----------+----------+----------------------------------------------
+ dept_id    | integer                |           | not null | nextval('departments_dept_id_seq'::regclass)
+ dept_name  | character varying(100) |           | not null |
+ location   | character varying(100) |           |          |
+Indexes:
+    "departments_pkey" PRIMARY KEY, btree (dept_id)
+Referenced by:
+    TABLE "employees" CONSTRAINT "employees_dept_id_fkey" FOREIGN KEY (dept_id) REFERENCES departments(dept_id)
+
+
+postgres=# INSERT INTO departments (dept_name, location) VALUES
+postgres-# ('Software Engineering', 'Building 1'),
+postgres-# ('Business Administration', 'Building 2'),
+postgres-# ('Economics', 'Building 3');
+INSERT 0 3
+
+postgres=# INSERT INTO employees (first_name, last_name, dept_id) VALUES
+postgres-# ('Kubat', 'Tursunov', 1),
+postgres-# ('Aigerim', 'Zamirbekova', 2),
+postgres-# ('Maksat', 'Toktobaev', 3);
+INSERT 0 3
+
+postgres=# SELECT d.dept_name, e.first_name, e.last_name
+postgres-# FROM departments d
+postgres-# JOIN employees e ON d.dept_id = e.dept_id
+postgres-# ORDER BY d.dept_name;
+       dept_name       | first_name |  last_name
+-----------------------+------------+-------------
+ Business Administration | Aigerim   | Zamirbekova
+ Economics               | Maksat    | Toktobaev
+ Software Engineering    | Kubat     | Tursunov
+(3 rows)
+
+
+postgres=# CREATE TABLE users (
+postgres(# user_id SERIAL PRIMARY KEY,
+postgres(# username VARCHAR(50) UNIQUE NOT NULL,
+postgres(# email VARCHAR(50) UNIQUE NOT NULL,
+postgres(# created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+postgres(# );
+CREATE TABLE
+
+postgres=# CREATE TABLE user_profiles (
+postgres(# profile_id SERIAL PRIMARY KEY,
+postgres(# user_id INTEGER UNIQUE NOT NULL,
+postgres(# first_name VARCHAR(50),
+postgres(# last_name VARCHAR(50),
+postgres(# bio TEXT,
+postgres(# profile_picture_url VARCHAR(255),
+postgres(# FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+postgres(# );
+CREATE TABLE
+
+postgres=# INSERT INTO users (username, email) VALUES
+postgres-# ('johndoe', 'john@example.com');
+INSERT 0 1
+
+postgres=# INSERT INTO user_profiles (user_id, first_name, last_name, bio) VALUES
+postgres-# (1, 'John', 'Doe', 'Software developer passionate about databases');
+INSERT 0 1
+
+
+postgres=# CREATE TABLE blog_posts (
+postgres(# post_id SERIAL PRIMARY KEY,
+postgres(# title VARCHAR(200) NOT NULL,
+postgres(# content TEXT,
+postgres(# author VARCHAR(100),
+postgres(# published_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+postgres(# );
+CREATE TABLE
+
+postgres=# CREATE TABLE comments (
+postgres(# comment_id SERIAL PRIMARY KEY,
+postgres(# post_id INTEGER NOT NULL,
+postgres(# commenter_name VARCHAR(100),
+postgres(# comment_text TEXT NOT NULL,
+postgres(# comment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+postgres(# FOREIGN KEY (post_id) REFERENCES blog_posts(post_id) ON DELETE CASCADE
+postgres(# );
+CREATE TABLE
+
+
+postgres=# INSERT INTO departments (dept_name, location) VALUES
+postgres-# ('Engineering', 'Main Building'),
+postgres-# ('Marketing', 'Annex Building');
+INSERT 0 2
+
+postgres=# INSERT INTO employees (first_name, last_name, dept_id) VALUES
+postgres-# ('John', 'Smith', 1),
+postgres-# ('Jane', 'Doe', 1),
+postgres-# ('Mike', 'Brown', 2);
+INSERT 0 3
+
+postgres=# SELECT d.dept_name, e.first_name, e.last_name
+postgres-# FROM departments d
+postgres-# JOIN employees e ON d.dept_id = e.dept_id
+postgres-# ORDER BY d.dept_name, e.last_name;
+    dept_name   | first_name | last_name
+----------------+------------+-----------
+ Engineering    | Jane       | Doe
+ Engineering    | John       | Smith
+ Marketing      | Mike       | Brown
+(3 rows)
+
+
+postgres=# CREATE TABLE students (
+postgres(# student_id SERIAL PRIMARY KEY,
+postgres(# first_name VARCHAR(50) NOT NULL,
+postgres(# last_name VARCHAR(50) NOT NULL,
+postgres(# email VARCHAR(100) UNIQUE,
+postgres(# enrollment_date DATE DEFAULT CURRENT_DATE
+postgres(# );
+CREATE TABLE
+
+postgres=# CREATE TABLE courses (
+postgres(# course_id SERIAL PRIMARY KEY,
+postgres(# course_code VARCHAR(10) UNIQUE NOT NULL,
+postgres(# course_name VARCHAR(100) NOT NULL,
+postgres(# credits INTEGER NOT NULL,
+postgres(# instructor VARCHAR(100)
+postgres(# );
+CREATE TABLE
+
+postgres=# CREATE TABLE student_enrollments (
+postgres(# enrollment_id SERIAL PRIMARY KEY,
+postgres(# student_id INTEGER NOT NULL,
+postgres(# course_id INTEGER NOT NULL,
+postgres(# enrollment_date DATE DEFAULT CURRENT_DATE,
+postgres(# grade CHAR(2),
+postgres(# FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+postgres(# FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
+postgres(# UNIQUE(student_id, course_id)
+postgres(# );
+CREATE TABLE
+
+postgres=# INSERT INTO students (first_name, last_name, email) VALUES
+postgres-# ('Alice', 'Johnson', 'alice@university.edu'),
+postgres-# ('Bob', 'Smith', 'bob@university.edu'),
+postgres-# ('Carol', 'Wilson', 'carol@university.edu');
+INSERT 0 3
+
+postgres=# INSERT INTO courses (course_code, course_name, credits, instructor) VALUES
+postgres-# ('CS101', 'Introduction to Programming', 3, 'Dr. Brown'),
+postgres-# ('CS102', 'Data Structures', 4, 'Dr. Davis'),
+postgres-# ('MATH101', 'Calculus', 4, 'Dr. Wilson');
+INSERT 0 3
+
+postgres=# INSERT INTO student_enrollments (student_id, course_id, grade) VALUES
+postgres-# (1, 1, 'A'),
+postgres-# (1, 2, 'B+'),
+postgres-# (2, 1, 'A-'),
+postgres-# (2, 3, 'B'),
+postgres-# (3, 2, 'A'),
+postgres-# (3, 3, 'A-');
+INSERT 0 6
+
+postgres=# SELECT
+postgres-# s.first_name || ' ' || s.last_name AS student_name,
+postgres-# c.course_code,
+postgres-# c.course_name,
+postgres-# se.grade,
+postgres-# se.enrollment_date
+postgres-# FROM students s
+postgres-# JOIN student_enrollments se ON s.student_id = se.student_id
+postgres-# JOIN courses c ON se.course_id = c.course_id
+postgres-# ORDER BY s.last_name, c.course_code;
+ student_name  | course_code |         course_name         | grade | enrollment_date
+---------------+-------------+-----------------------------+-------+-----------------
+ Alice Johnson | CS101       | Introduction to Programming | A     | 2025-10-16
+ Alice Johnson | CS102       | Data Structures             | B+    | 2025-10-16
+ Bob Smith     | CS101       | Introduction to Programming | A-    | 2025-10-16
+ Bob Smith     | MATH101     | Calculus                    | B     | 2025-10-16
+ Carol Wilson  | CS102       | Data Structures             | A     | 2025-10-16
+ Carol Wilson  | MATH101     | Calculus                    | A-    | 2025-10-16
+(6 rows)
+
+
+postgres=# SELECT
+postgres-# s.first_name, s.last_name, se.grade
+postgres-# FROM students s
+postgres-# JOIN student_enrollments se ON s.student_id = se.student_id
+postgres-# JOIN courses c ON se.course_id = c.course_id
+postgres-# WHERE c.course_code = 'CS101';
+ first_name | last_name | grade
+------------+-----------+-------
+ Alice      | Johnson   | A
+ Bob        | Smith     | A-
+(2 rows)
+
+
+postgres=# SELECT
+postgres-# c.course_code, c.course_name, c.credits, se.grade
+postgres-# FROM students s
+postgres-# JOIN student_enrollments se ON s.student_id = se.student_id
+postgres-# JOIN courses c ON se.course_id = c.course_id
+postgres-# WHERE s.email = 'alice@university.edu';
+ course_code |         course_name         | credits | grade
+-------------+-----------------------------+---------+-------
+ CS101       | Introduction to Programming |       3 | A
+ CS102       | Data Structures             |       4 | B+
+(2 rows)
+
+
+postgres=# \q
