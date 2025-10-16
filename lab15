@@ -1,0 +1,269 @@
+PS C:\Users\kubat> cd "C:\Program Files\PostgreSQL\17\bin"
+PS C:\Program Files\PostgreSQL\17\bin> psql -U postgres
+Password for user postgres:
+
+psql (17.6)
+Type "help" for help.
+
+postgres=# DROP TABLE IF EXISTS employees, departments, products, customers,
+postgres-#     orders, order_items, sales_data, customer_feedback,
+postgres-#     staging_customers, target_customers CASCADE;
+DROP TABLE
+
+postgres=# CREATE TABLE employees (
+postgres(#     employee_id SERIAL PRIMARY KEY,
+postgres(#     first_name VARCHAR(50),
+postgres(#     last_name VARCHAR(50),
+postgres(#     email VARCHAR(100),
+postgres(#     department VARCHAR(50),
+postgres(#     hire_date DATE DEFAULT CURRENT_DATE,
+postgres(#     salary DECIMAL(10,2)
+postgres(# );
+CREATE TABLE
+
+postgres=# INSERT INTO employees (first_name, last_name, email, department, salary) VALUES
+postgres-# ('Kubat', 'Nizamov', 'kubat@company.com', 'IT', 75000),
+postgres-# ('Aigerim', 'Toktonalieva', 'aigerim@company.com', 'HR', 60000),
+postgres-# ('Nurlan', 'Sadykov', 'nurlan@company.com', 'Finance', 82000);
+INSERT 0 3
+
+postgres=# CREATE TABLE departments (
+postgres(#     department_id SERIAL PRIMARY KEY,
+postgres(#     name VARCHAR(50),
+postgres(#     location VARCHAR(100)
+postgres(# );
+CREATE TABLE
+
+postgres=# INSERT INTO departments (name, location) VALUES
+postgres-# ('IT', 'Bishkek'),
+postgres-# ('HR', 'Osh'),
+postgres-# ('Finance', 'Almaty');
+INSERT 0 3
+
+postgres=# CREATE TABLE products (
+postgres(#     product_id SERIAL PRIMARY KEY,
+postgres(#     name VARCHAR(100),
+postgres(#     price DECIMAL(10,2) CHECK (price >= 0)
+postgres(# );
+CREATE TABLE
+
+postgres=# INSERT INTO products (name, price) VALUES
+postgres-# ('Monitor', 290.00),
+postgres-# ('Keyboard', 80.00),
+postgres-# ('Mouse', 25.00),
+postgres-# ('Laptop', 1100.00);
+INSERT 0 4
+
+postgres=# CREATE TABLE customers (
+postgres(#     customer_id SERIAL PRIMARY KEY,
+postgres(#     name VARCHAR(100),
+postgres(#     email VARCHAR(100)
+postgres(# );
+CREATE TABLE
+
+postgres=# INSERT INTO customers (name, email) VALUES
+postgres-# ('Madina Ermekova', 'madina@shop.com'),
+postgres-# ('Tilek Saparov', 'tilek@shop.com');
+INSERT 0 2
+
+postgres=# CREATE TABLE orders (
+postgres(#     order_id SERIAL PRIMARY KEY,
+postgres(#     customer_id INT REFERENCES customers(customer_id),
+postgres(#     total DECIMAL(10,2),
+postgres(#     order_date DATE DEFAULT CURRENT_DATE
+postgres(# );
+CREATE TABLE
+
+postgres=# INSERT INTO orders (customer_id, total) VALUES
+postgres-# (1, 300.00),
+postgres-# (2, 150.00);
+INSERT 0 2
+
+postgres=# CREATE TABLE order_items (
+postgres(#     order_item_id SERIAL PRIMARY KEY,
+postgres(#     order_id INT REFERENCES orders(order_id),
+postgres(#     product_id INT REFERENCES products(product_id),
+postgres(#     quantity INT
+postgres(# );
+CREATE TABLE
+
+postgres=# INSERT INTO order_items (order_id, product_id, quantity) VALUES
+postgres-# (1, 1, 1),
+postgres-# (1, 3, 2),
+postgres-# (2, 4, 1);
+INSERT 0 3
+
+postgres=# CREATE TABLE customer_feedback (
+postgres(#     feedback_id SERIAL PRIMARY KEY,
+postgres(#     customer_id INT REFERENCES customers(customer_id),
+postgres(#     comment TEXT
+postgres(# );
+CREATE TABLE
+
+postgres=# INSERT INTO customer_feedback (customer_id, comment) VALUES
+postgres-# (1, 'Excellent product quality and fast delivery.'),
+postgres-# (2, 'Items arrived safely, satisfied with service.');
+INSERT 0 2
+
+postgres=# CREATE TABLE sales_data (
+postgres(#     sale_id SERIAL PRIMARY KEY,
+postgres(#     product_id INT REFERENCES products(product_id),
+postgres(#     quantity INT,
+postgres(#     total DECIMAL(10,2),
+postgres(#     region VARCHAR(50)
+postgres(# );
+CREATE TABLE
+
+postgres=# INSERT INTO sales_data (product_id, quantity, total, region) VALUES
+postgres-# (1, 4, 1160.00, 'North'),
+postgres-# (2, 6, 480.00, 'West'),
+postgres-# (4, 2, 2200.00, 'South');
+INSERT 0 3
+
+postgres=# COPY employees TO '/tmp/employees.txt' WITH DELIMITER '|' NULL 'N/A' CSV HEADER;
+COPY 3
+postgres=# COPY employees(first_name, last_name, email)
+postgres-# FROM '/tmp/new_employees.csv' WITH CSV HEADER;
+COPY 3
+postgres=# COPY (SELECT * FROM employees WHERE department = 'IT')
+postgres-# TO '/tmp/it_employees.csv' WITH CSV HEADER;
+COPY 1
+postgres=# COPY products TO '/tmp/products.csv' WITH CSV HEADER;
+COPY 4
+postgres=# COPY customers TO '/tmp/customers.csv' WITH CSV HEADER DELIMITER ';' QUOTE '"';
+COPY 2
+postgres=# COPY orders TO '/tmp/orders.csv' WITH CSV HEADER FORCE_QUOTE (order_date);
+COPY 2
+postgres=# COPY customer_feedback TO '/tmp/feedback.csv' WITH CSV HEADER DELIMITER ',' QUOTE '"' ESCAPE '"';
+COPY 2
+postgres=# COPY sales_data FROM '/tmp/sales.csv' WITH CSV HEADER NULL 'NULL';
+COPY 3
+
+postgres=# CREATE DATABASE company_hr;
+CREATE DATABASE
+postgres=# \c company_hr
+You are now connected to database "company_hr" as user "postgres".
+
+company_hr=# CREATE TABLE departments (
+company_hr(#     department_id SERIAL PRIMARY KEY,
+company_hr(#     name VARCHAR(100) NOT NULL,
+company_hr(#     location VARCHAR(100)
+company_hr(# );
+CREATE TABLE
+
+company_hr=# CREATE TABLE employees (
+company_hr(#     employee_id SERIAL PRIMARY KEY,
+company_hr(#     first_name VARCHAR(50),
+company_hr(#     last_name VARCHAR(50),
+company_hr(#     department_id INT REFERENCES departments(department_id),
+company_hr(#     salary NUMERIC(10, 2),
+company_hr(#     hire_date DATE DEFAULT CURRENT_DATE
+company_hr(# );
+CREATE TABLE
+
+company_hr=# CREATE TABLE projects (
+company_hr(#     project_id SERIAL PRIMARY KEY,
+company_hr(#     name VARCHAR(100),
+company_hr(#     start_date DATE,
+company_hr(#     end_date DATE
+company_hr(# );
+CREATE TABLE
+
+company_hr=# CREATE TABLE assignments (
+company_hr(#     employee_id INT REFERENCES employees(employee_id),
+company_hr(#     project_id INT REFERENCES projects(project_id),
+company_hr(#     role VARCHAR(50),
+company_hr(#     PRIMARY KEY (employee_id, project_id)
+company_hr(# );
+CREATE TABLE
+
+company_hr=# INSERT INTO departments (name, location) VALUES
+company_hr-# ('Engineering', 'Bishkek'),
+company_hr-# ('HR', 'Osh'),
+company_hr-# ('Finance', 'Almaty');
+INSERT 0 3
+
+company_hr=# INSERT INTO employees (first_name, last_name, department_id, salary) VALUES
+company_hr-# ('Kubat', 'Asanov', 1, 87000),
+company_hr-# ('Aigerim', 'Tilekova', 1, 91000),
+company_hr-# ('Nurlan', 'Bekov', 2, 65000),
+company_hr-# ('Madina', 'Erkinova', 3, 70000);
+INSERT 0 4
+
+company_hr=# INSERT INTO projects (name, start_date, end_date) VALUES
+company_hr-# ('Orion', '2024-01-01', '2024-12-31'),
+company_hr-# ('Neptune', '2024-03-01', '2025-03-01');
+INSERT 0 2
+
+company_hr=# INSERT INTO assignments VALUES
+company_hr-# (1, 1, 'Developer'),
+company_hr-# (2, 1, 'Team Lead'),
+company_hr-# (3, 2, 'HR Coordinator'),
+company_hr-# (4, 2, 'Analyst');
+INSERT 0 4
+
+company_hr=# CREATE DATABASE salesdb;
+CREATE DATABASE
+company_hr=# \c salesdb
+You are now connected to database "salesdb" as user "postgres".
+
+salesdb=# CREATE TABLE customers (
+salesdb(#     customer_id SERIAL PRIMARY KEY,
+salesdb(#     name VARCHAR(100),
+salesdb(#     email VARCHAR(100),
+salesdb(#     city VARCHAR(100)
+salesdb(# );
+CREATE TABLE
+
+salesdb=# CREATE TABLE products (
+salesdb(#     product_id SERIAL PRIMARY KEY,
+salesdb(#     name VARCHAR(100),
+salesdb(#     price NUMERIC(8,2)
+salesdb(# );
+CREATE TABLE
+
+salesdb=# CREATE TABLE orders (
+salesdb(#     order_id SERIAL PRIMARY KEY,
+salesdb(#     customer_id INT REFERENCES customers(customer_id),
+salesdb(#     order_date DATE DEFAULT CURRENT_DATE,
+salesdb(#     total NUMERIC(10,2)
+salesdb(# );
+CREATE TABLE
+
+salesdb=# CREATE TABLE order_items (
+salesdb(#     order_id INT REFERENCES orders(order_id),
+salesdb(#     product_id INT REFERENCES products(product_id),
+salesdb(#     quantity INT CHECK (quantity > 0),
+salesdb(#     PRIMARY KEY (order_id, product_id)
+salesdb(# );
+CREATE TABLE
+
+salesdb=# INSERT INTO customers (name, email, city) VALUES
+salesdb-# ('Aizada Turusbekova', 'aizada@market.com', 'Bishkek'),
+salesdb-# ('Ruslan Toktobaev', 'ruslan@market.com', 'Osh'),
+salesdb-# ('Meerim Satybaldieva', 'meerim@market.com', 'Almaty');
+INSERT 0 3
+
+salesdb=# INSERT INTO products (name, price) VALUES
+salesdb-# ('Monitor', 320.00),
+salesdb-# ('Keyboard', 85.00),
+salesdb-# ('Mouse', 30.00),
+salesdb-# ('Laptop', 1150.00);
+INSERT 0 4
+
+salesdb=# INSERT INTO orders (customer_id, total) VALUES
+salesdb-# (1, 1230.00),
+salesdb-# (2, 200.00),
+salesdb-# (3, 1450.00);
+INSERT 0 3
+
+salesdb=# INSERT INTO order_items VALUES
+salesdb-# (1, 4, 1),
+salesdb-# (1, 2, 1),
+salesdb-# (2, 3, 2),
+salesdb-# (3, 1, 1),
+salesdb-# (3, 4, 1);
+INSERT 0 5
+
+salesdb=# \q
+PS C:\Program Files\PostgreSQL\17\bin>
