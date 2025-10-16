@@ -1,0 +1,232 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+PS C:\Users\kubat> cd "C:\Program Files\PostgreSQL\17\bin"
+PS C:\Program Files\PostgreSQL\17\bin> psql -U postgres
+Password for user postgres:
+
+psql (17.6)
+WARNING: Console code page (437) differs from Windows code page (1252)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# SELECT first_name, last_name, salary
+postgres-# FROM employees
+postgres-# WHERE salary > (
+postgres(#     SELECT AVG(salary)
+postgres(#     FROM employees
+postgres(# );
+ERROR:  relation "employees" does not exist
+postgres=# CREATE TABLE employees (
+postgres(#     employee_id SERIAL PRIMARY KEY,
+postgres(#     first_name VARCHAR(50),
+postgres(#     last_name VARCHAR(50),
+postgres(#     department VARCHAR(50),
+postgres(#     salary NUMERIC(10,2),
+postgres(#     manager_id INT
+postgres(# );
+CREATE TABLE
+postgres=# INSERT INTO employees (first_name, last_name, department, salary, manager_id) VALUES
+postgres-# ('Kubat', 'Asanov', 'IT', 92000, NULL),
+postgres-# ('Aigerim', 'Muratova', 'IT', 76000, 1),
+postgres-# ('Nurlan', 'Isakov', 'HR', 61000, NULL),
+postgres-# ('Aizhan', 'Bekova', 'HR', 54000, 3),
+postgres-# ('Ruslan', 'Tursunov', 'Finance', 68000, NULL),
+postgres-# ('Mira', 'Kasymova', 'Finance', 52000, 5);
+INSERT 0 6
+postgres=# CREATE TABLE orders (
+postgres(#     order_id SERIAL PRIMARY KEY,
+postgres(#     customer_name VARCHAR(50),
+postgres(#     region_id INT,
+postgres(#     amount NUMERIC(10,2),
+postgres(#     status VARCHAR(20)
+postgres(# );
+CREATE TABLE
+postgres=# INSERT INTO orders (customer_name, region_id, amount, status) VALUES
+postgres-# ('Adilet', 1, 1800, 'High Priority'),
+postgres-# ('Meerim', 1, 950, 'Low Priority'),
+postgres-# ('Ermek', 2, 4800, 'Medium Priority'),
+postgres-# ('Nursultan', 3, 15500, 'High Priority'),
+postgres-# ('Tamara', 2, 650, 'Low Priority');
+INSERT 0 5
+postgres=# CREATE TABLE warehouse_1 (
+postgres(#     product_id INT,
+postgres(#     product_name VARCHAR(50),
+postgres(#     quantity INT
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE warehouse_2 (
+postgres(#     product_id INT,
+postgres(#     product_name VARCHAR(50),
+postgres(#     quantity INT
+postgres(# );
+CREATE TABLE
+postgres=# INSERT INTO warehouse_1 VALUES
+postgres-# (1, 'Laptop', 4),
+postgres-# (2, 'Tablet', 7),
+postgres-# (3, 'Mouse', 0);
+INSERT 0 3
+postgres=# INSERT INTO warehouse_2 VALUES
+postgres-# (2, 'Tablet', 2),
+postgres-# (3, 'Mouse', 0),
+postgres-# (4, 'Printer', 5);
+INSERT 0 3
+postgres=# CREATE TABLE sales (
+postgres(#     product_name VARCHAR(50),
+postgres(#     year INT,
+postgres(#     sales_amount NUMERIC(10,2)
+postgres(# );
+CREATE TABLE
+postgres=# INSERT INTO sales VALUES
+postgres-# ('Laptop', 2022, 54000),
+postgres-# ('Laptop', 2023, 68000),
+postgres-# ('Laptop', 2024, 76000),
+postgres-# ('Tablet', 2022, 42000),
+postgres-# ('Tablet', 2023, 47000),
+postgres-# ('Tablet', 2024, 49000),
+postgres-# ('Printer', 2023, 31000),
+postgres-# ('Printer', 2024, 36000);
+INSERT 0 8
+postgres=# CREATE TABLE pivoted_sales (
+postgres(#     product_name VARCHAR(50),
+postgres(#     year_2022 NUMERIC(10,2),
+postgres(#     year_2023 NUMERIC(10,2),
+postgres(#     year_2024 NUMERIC(10,2)
+postgres(# );
+CREATE TABLE
+postgres=# INSERT INTO pivoted_sales VALUES
+postgres-# ('Laptop', 54000, 68000, 76000),
+postgres-# ('Tablet', 42000, 47000, 49000),
+postgres-# ('Printer', 0, 31000, 36000);
+INSERT 0 3
+postgres=# CREATE INDEX idx_orders_region ON orders(region_id);
+CREATE INDEX
+postgres=# CREATE INDEX idx_employees_department ON employees(department);
+CREATE INDEX
+postgres=# SELECT first_name, last_name, salary
+postgres-# FROM employees
+postgres-# WHERE salary > (
+postgres(#     SELECT AVG(salary)
+postgres(#     FROM employees
+postgres(# );
+ first_name | last_name |  salary
+------------+-----------+----------
+ Kubat      | Asanov    | 92000.00
+ Aigerim    | Muratova  | 76000.00
+ Ruslan     | Tursunov  | 68000.00
+(3 rows)
+
+
+postgres=# WITH regional_sales AS (
+postgres(#     SELECT region_id, SUM(amount) AS total_sales
+postgres(#     FROM orders
+postgres(#     GROUP BY region_id
+postgres(# )
+postgres-# SELECT region_id, total_sales
+postgres-# FROM regional_sales
+postgres-# WHERE total_sales > 10000;
+ region_id | total_sales
+-----------+-------------
+         3 |     15500.00
+(1 row)
+
+
+postgres=# WITH RECURSIVE org_chart AS (
+postgres(#     SELECT employee_id, first_name, last_name, manager_id
+postgres(#     FROM employees
+postgres(#     WHERE manager_id IS NULL
+postgres(#     UNION ALL
+postgres(#     SELECT e.employee_id, e.first_name, e.last_name, e.manager_id
+postgres(#     FROM employees e
+postgres(#     INNER JOIN org_chart oc ON e.manager_id = oc.employee_id
+postgres(# )
+postgres-# SELECT * FROM org_chart;
+ employee_id | first_name | last_name | manager_id
+-------------+------------+-----------+------------
+           1 | Kubat      | Asanov    |
+           3 | Nurlan     | Isakov    |
+           5 | Ruslan     | Tursunov  |
+           2 | Aigerim    | Muratova  |          1
+           4 | Aizhan     | Bekova    |          3
+           6 | Mira       | Kasymova  |          5
+(6 rows)
+
+
+postgres=# SELECT product_name FROM warehouse_1
+postgres-# UNION
+postgres-# SELECT product_name FROM warehouse_2;
+ product_name
+--------------
+ Printer
+ Tablet
+ Laptop
+ Mouse
+(4 rows)
+
+
+postgres=# SELECT product_id FROM warehouse_1 WHERE quantity = 0
+postgres-# INTERSECT
+postgres-# SELECT product_id FROM warehouse_2 WHERE quantity = 0;
+ product_id
+------------
+          3
+(1 row)
+
+
+postgres=# SELECT
+postgres-#     first_name,
+postgres-#     last_name,
+postgres-#     department,
+postgres-#     salary,
+postgres-#     RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS dept_salary_rank
+postgres-# FROM employees;
+ first_name | last_name | department |  salary  | dept_salary_rank
+------------+-----------+------------+----------+------------------
+ Ruslan     | Tursunov  | Finance    | 68000.00 |                1
+ Mira       | Kasymova  | Finance    | 52000.00 |                2
+ Nurlan     | Isakov    | HR         | 61000.00 |                1
+ Aizhan     | Bekova    | HR         | 54000.00 |                2
+ Kubat      | Asanov    | IT         | 92000.00 |                1
+ Aigerim    | Muratova  | IT         | 76000.00 |                2
+(6 rows)
+
+
+postgres=# SELECT
+postgres-#     product_name,
+postgres-#     SUM(CASE WHEN year = 2022 THEN sales_amount ELSE 0 END) AS year_2022,
+postgres-#     SUM(CASE WHEN year = 2023 THEN sales_amount ELSE 0 END) AS year_2023,
+postgres-#     SUM(CASE WHEN year = 2024 THEN sales_amount ELSE 0 END) AS year_2024
+postgres-# FROM sales
+postgres-# GROUP BY product_name;
+ product_name | year_2022 | year_2023 | year_2024
+--------------+-----------+-----------+-----------
+ Tablet       |  42000.00 |  47000.00 |  49000.00
+ Printer      |      0.00 |  31000.00 |  36000.00
+ Laptop       |  54000.00 |  68000.00 |  76000.00
+(3 rows)
+
+
+postgres=# SELECT product_name, '2022' AS year, year_2022 AS sales_amount FROM pivoted_sales
+postgres-# UNION ALL
+postgres-# SELECT product_name, '2023' AS year, year_2023 AS sales_amount FROM pivoted_sales
+postgres-# UNION ALL
+postgres-# SELECT product_name, '2024' AS year, year_2024 AS sales_amount FROM pivoted_sales
+postgres-# ORDER BY product_name, year;
+ product_name | year | sales_amount
+--------------+------+--------------
+ Laptop       | 2022 |     54000.00
+ Laptop       | 2023 |     68000.00
+ Laptop       | 2024 |     76000.00
+ Printer      | 2022 |         0.00
+ Printer      | 2023 |     31000.00
+ Printer      | 2024 |     36000.00
+ Tablet       | 2022 |     42000.00
+ Tablet       | 2023 |     47000.00
+ Tablet       | 2024 |     49000.00
+(9 rows)
+
+
+postgres=#
