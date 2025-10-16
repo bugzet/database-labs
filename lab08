@@ -1,0 +1,48 @@
+postgres=# \dt
+                List of relations
+ Schema |        Name         | Type  |  Owner
+--------+---------------------+-------+----------
+ public | authors             | table | postgres
+ public | blog_posts          | table | postgres
+ public | book_authors        | table | postgres
+ public | books               | table | postgres
+ public | comments            | table | postgres
+ public | courses             | table | postgres
+ public | departments         | table | postgres
+ public | employees           | table | postgres
+ public | enrollments         | table | postgres
+ public | enrollments_bad     | table | postgres
+ public | loans               | table | postgres
+ public | members             | table | postgres
+ public | student_enrollments | table | postgres
+ public | student_phones      | table | postgres
+ public | students            | table | postgres
+ public | students_bad        | table | postgres
+ public | university_students | table | postgres
+(17 rows)
+
+
+postgres=# \d authors
+                                         Table "public.authors"
+   Column   |         Type          | Collation | Nullable |                  Default
+------------+-----------------------+-----------+----------+--------------------------------------------
+ author_id  | integer               |           | not null | nextval('authors_author_id_seq'::regclass)
+ first_name | character varying(50) |           | not null |
+ last_name  | character varying(50) |           | not null |
+ birth_date | date                  |           |          |
+Indexes:
+    "authors_pkey" PRIMARY KEY, btree (author_id)
+Referenced by:
+    TABLE "book_authors" CONSTRAINT "book_authors_author_id_fkey" FOREIGN KEY (author_id) REFERENCES authors(author_id)
+
+
+postgres=# SELECT * FROM authors;
+ author_id | first_name | last_name | birth_date
+-----------+------------+-----------+------------
+         1 | George     | Orwell    | 1903-06-25
+         2 | Jane       | Austen    | 1775-12-16
+         3 | Fyodor     | Dostoevsky| 1821-11-11
+(3 rows)
+
+
+postgres=#
