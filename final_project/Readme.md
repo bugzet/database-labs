@@ -1,7 +1,8 @@
 # CyberClub Management System
 
-A full-stack web application for managing a computer club.  
+A full-stack web application for managing a computer club.
 The system features an interactive booking map, user balance management, a powerful administration dashboard, and a **Telegram Bot** for remote booking.
+Developed in pair by **Kubat Rysbekov** and **Ulukbek Stambekov**.
 
 Built with **Flask**, **PostgreSQL**, and **Telebot**.
 
