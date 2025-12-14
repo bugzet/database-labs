@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Вход - CyberClub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+
+        <h2 class="form-title">🔑 Вход в систему</h2>
+        <p style="text-align: center; color: var(--text-secondary); margin-bottom: 25px;">
+            Войдите в свой аккаунт CyberClub
+        </p>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="login-phone" class="form-label">📱 Телефон:</label>
+                <input type="tel" id="login-phone" name="phone" class="form-input"
+                       placeholder="+79991234567" required>
+            </div>
+
+            <div class="form-group">
+                <label for="login-password" class="form-label">🔒 Пароль:</label>
+                <input type="password" id="login-password" name="password" class="form-input"
+                       placeholder="Введите ваш пароль" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary submit-btn" style="width: 100%; margin-top: 10px;">
+                ✅ Войти в систему
+            </button>
+        </form>
+
+        <div id="login-message" style="margin-top: 20px;"></div>
+
+        <div class="form-footer">
+            Нет аккаунта?
+            <a href="{{ url_for('views.register_page') }}" class="form-link">Зарегистрироваться</a>
+            <br>
+            <a href="{{ url_for('views.users_page') }}" class="form-link" style="font-size: 0.9em; opacity: 0.8; margin-top: 5px; display: inline-block;">
+                Посмотреть всех пользователей
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/login.js') }}"></script>
+{% endblock %}

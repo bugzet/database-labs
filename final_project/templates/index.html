@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Главная - CyberClub{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="hero-overlay"></div>
+
+    <div class="container hero-content text-center">
+        <h1 class="hero-title">
+            Добро пожаловать в <br>
+            <span class="text-highlight">CyberClub!</span>
+        </h1>
+        <p class="hero-subtitle">
+            Топовое железо, атмосфера киберпанка и мгновенное бронирование.
+            Твоя игра начинается здесь.
+        </p>
+
+        <a href="{{ url_for('views.booking_page') }}" class="btn btn-primary btn-lg btn-glow">
+            🚀 Забронировать место
+        </a>
+    </div>
+</section>
+
+<section class="features-section">
+    <div class="container">
+        <div class="features-grid">
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    👤
+                </div>
+                <h3>Простая регистрация</h3>
+                <p>Создай аккаунт за 30 секунд по номеру телефона и получи доступ к личному кабинету.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    🗺️
+                </div>
+                <h3>Интерактивная карта</h3>
+                <p>Выбирай любимое место на визуальной карте клуба. Видишь свободный ПК? Бронируй в один клик!</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    💳
+                </div>
+                <h3>Удобная оплата</h3>
+                <p>Пополняй баланс через администратора и система автоматически спишет средства при бронировании.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Пользователи - CyberClub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="users-header">
+        <h1 class="users-title">Управление пользователями</h1>
+
+        <div class="users-actions">
+            <a href="{{ url_for('views.register_page') }}" class="btn btn-success">
+                ➕ Создать
+            </a>
+
+            <button onclick="loadUsers()" class="btn btn-primary">
+                🔄 Обновить
+            </button>
+        </div>
+    </div>
+
+    <div id="usersList" class="users-grid"></div>
+
+    <div id="loading" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+        <div style="font-size: 1.5rem; margin-bottom: 10px;">⏳</div>
+        <div>Загрузка списка пользователей...</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/users.js') }}"></script>
+{% endblock %}

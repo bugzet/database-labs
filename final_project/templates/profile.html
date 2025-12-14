@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Профиль - CyberClub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container" style="max-width: 600px;">
+
+        <h2 class="form-title">👤 Личный кабинет</h2>
+        <p style="text-align: center; color: var(--text-secondary); margin-bottom: 25px;">
+            Ваш профиль в CyberClub
+        </p>
+
+        <div id="profile-content">
+            <div class="loading">
+                <div style="text-align: center; color: var(--text-secondary);">
+                    ⏳ Загрузка профиля...
+                </div>
+            </div>
+        </div>
+
+        <div class="form-footer" style="margin-top: 30px; display: flex; flex-direction: column; gap: 15px;">
+
+            <button id="admin-cheat-btn" class="btn" style="background-color: var(--accent-purple); color: white; box-shadow: 0 4px 15px rgba(121, 40, 202, 0.4);">
+                👑 Стать Администратором (для тестирования)
+            </button>
+
+            <button id="logout-btn" class="btn" style="background-color: var(--accent-danger); color: white; box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);">
+                🚪 Выйти из системы
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+{% endblock %}

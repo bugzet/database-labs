@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Регистрация - CyberClub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+
+        <h2 class="form-title">Регистрация</h2>
+        <p style="text-align: center; color: var(--text-secondary); margin-bottom: 25px;">
+            Создайте аккаунт в CyberClub
+        </p>
+
+        <div id="message" class="mb-20"></div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="name" class="form-label">👤 ФИО:</label>
+                <input type="text" id="name" name="name" class="form-input"
+                       placeholder="Иван Иванов" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone" class="form-label">📱 Телефон:</label>
+                <input type="tel" id="phone" name="phone" class="form-input"
+                       placeholder="+79991234567" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">🔒 Пароль:</label>
+                <input type="password" id="password" name="password" class="form-input"
+                       placeholder="Придумайте надежный пароль" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary submit-btn" style="width: 100%; margin-top: 10px;">
+                ✅ Зарегистрироваться
+            </button>
+        </form>
+
+        <div class="form-footer">
+            Уже есть аккаунт?
+            <a href="{{ url_for('views.login_page') }}" class="form-link">Войти</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/register.js') }}"></script>
+{% endblock %}

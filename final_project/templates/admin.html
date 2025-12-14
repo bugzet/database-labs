@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Админка - CyberClub{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <div class="users-header">
+        <h1 class="users-title">🛠 Панель администратора</h1>
+
+        <div style="flex-grow: 1; max-width: 400px;">
+            <input type="text" id="adminSearch" placeholder="🔍 Поиск по имени или телефону..." class="form-input" style="background-color: rgba(0,0,0,0.2);">
+        </div>
+
+        <div class="users-actions">
+            <button onclick="loadAdminUsers()" class="btn btn-primary">
+                🔄 Обновить
+            </button>
+        </div>
+    </div>
+
+    <div id="adminUsersList" class="users-grid"></div>
+
+</div>
+
+<div id="topupModal" class="modal-overlay">
+    <div class="modal-window">
+        <div class="modal-header">
+            <h2 style="margin:0;">💰 Пополнение баланса</h2>
+            <button onclick="closeModal()" class="close-btn">&times;</button>
+        </div>
+
+        <div class="modal-body">
+            <p id="topupUserName" style="color: var(--text-secondary); margin-bottom: 20px; font-size: 1.1rem;"></p>
+
+            <div class="form-group">
+                <label class="form-label">Сумма пополнения (RUB):</label>
+                <input type="number" id="topupAmount" class="form-input" placeholder="1000" min="1">
+            </div>
+
+            <div style="background: rgba(40, 167, 69, 0.1); border: 1px solid var(--accent-success); padding: 10px; border-radius: 8px; font-size: 0.9rem; color: #75b798; margin-top: 15px;">
+                ⚠️ Деньги будут начислены пользователю моментально.
+            </div>
+        </div>
+
+        <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button onclick="closeModal()" class="btn" style="background: transparent; border: 1px solid var(--text-secondary); color: var(--text-secondary);">Отмена</button>
+            <button onclick="submitTopUp()" class="btn btn-success">✅ Пополнить счет</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
