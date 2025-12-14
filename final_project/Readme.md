@@ -18,6 +18,7 @@ Built with **Flask**, **PostgreSQL**, and **Telebot**.
 
 ### Database
 - PostgreSQL
+For the information on Database structure head to "Database.md"
 
 ### Frontend
 - HTML5  
