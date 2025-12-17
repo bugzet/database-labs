@@ -1,0 +1,166 @@
+PS C:\Users\kubat> cd "C:\Program Files\PostgreSQL\17\bin"
+PS C:\Program Files\PostgreSQL\17\bin> psql -U postgres
+Password for user postgres:
+
+psql (17.6)
+Type "help" for help.
+
+postgres=# DROP TABLE IF EXISTS accounts, logs CASCADE;
+DROP TABLE
+
+postgres=# CREATE TABLE accounts (
+postgres(#     account_id SERIAL PRIMARY KEY,
+postgres(#     owner_name VARCHAR(100),
+postgres(#     balance NUMERIC(10,2) CHECK (balance >= 0)
+postgres(# );
+CREATE TABLE
+
+postgres=# CREATE TABLE logs (
+postgres(#     log_id SERIAL PRIMARY KEY,
+postgres(#     message TEXT,
+postgres(#     created_at TIMESTAMP DEFAULT NOW()
+postgres(# );
+CREATE TABLE
+
+postgres=# INSERT INTO accounts (owner_name, balance) VALUES
+postgres-# ('Aibek', 1000.00),
+postgres-# ('Ainura', 500.00),
+postgres-# ('Bakyt', 300.00);
+INSERT 0 3
+
+postgres=# -- 1. Simple Transaction (BEGIN, COMMIT, ROLLBACK)
+postgres=# BEGIN;
+BEGIN
+postgres=*# UPDATE accounts SET balance = balance - 200 WHERE account_id = 1;
+UPDATE 1
+postgres=*# UPDATE accounts SET balance = balance + 200 WHERE account_id = 2;
+UPDATE 1
+postgres=*# COMMIT;
+COMMIT
+
+postgres=# SELECT * FROM accounts;
+ account_id | owner_name | balance
+------------+------------+---------
+          3 | Bakyt      |  300.00
+          1 | Aibek      |  800.00
+          2 | Ainura     |  700.00
+(3 rows)
+
+postgres=# BEGIN;
+BEGIN
+postgres=*# UPDATE accounts SET balance = balance - 100 WHERE account_id = 3;
+UPDATE 1
+postgres=*# UPDATE accounts SET balance = balance + 100 WHERE account_id = 2;
+UPDATE 1
+postgres=*# ROLLBACK;
+ROLLBACK
+
+postgres=# SELECT * FROM accounts;
+ account_id | owner_name | balance
+------------+------------+---------
+          3 | Bakyt      |  300.00
+          1 | Aibek      |  800.00
+          2 | Ainura     |  700.00
+(3 rows)
+
+postgres=# -- 2. ACID Principles
+postgres=# BEGIN;
+BEGIN
+postgres=*# INSERT INTO logs (message) VALUES ('Starting transfer operation');
+INSERT 0 1
+postgres=*# UPDATE accounts SET balance = balance - 100 WHERE account_id = 1;
+UPDATE 1
+postgres=*# UPDATE accounts SET balance = balance + 100 WHERE account_id = 2;
+UPDATE 1
+postgres=*# COMMIT;
+COMMIT
+
+postgres=# -- CONSISTENCY check (should fail)
+postgres=# BEGIN;
+BEGIN
+postgres=*# UPDATE accounts SET balance = balance - 2000 WHERE account_id = 3;
+ERROR:  new row for relation "accounts" violates check constraint "accounts_balance_check"
+DETAIL:  Failing row contains (3, Bakyt, -1700.00).
+postgres=!# COMMIT;
+ROLLBACK
+
+postgres=# -- 3. Isolation Levels
+postgres=# BEGIN TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+BEGIN
+postgres=*# SELECT * FROM accounts;
+postgres=*# COMMIT;
+COMMIT
+
+postgres=# BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+BEGIN
+postgres=*# SELECT * FROM accounts;
+postgres=*# COMMIT;
+COMMIT
+
+postgres=# -- 4. SAVEPOINT
+postgres=# BEGIN;
+BEGIN
+postgres=*# INSERT INTO logs (message) VALUES ('Test savepoint');
+INSERT 0 1
+postgres=*# SAVEPOINT sp1;
+SAVEPOINT
+postgres=*# UPDATE accounts SET balance = balance - 50 WHERE account_id = 2;
+UPDATE 1
+postgres=*# ROLLBACK TO SAVEPOINT sp1;
+ROLLBACK
+postgres=*# INSERT INTO logs (message) VALUES ('After savepoint rollback');
+INSERT 0 1
+postgres=*# COMMIT;
+COMMIT
+
+postgres=# -- 5. Multiple SAVEPOINTs
+postgres=# BEGIN;
+BEGIN
+postgres=*# INSERT INTO accounts (owner_name, balance) VALUES ('Test1', 100);
+INSERT 0 1
+postgres=*# SAVEPOINT sp1;
+SAVEPOINT
+postgres=*# INSERT INTO accounts (owner_name, balance) VALUES ('Test2', 200);
+SAVEPOINT sp2;
+SAVEPOINT
+postgres=*# INSERT INTO accounts (owner_name, balance) VALUES ('ErrorUser', -50);
+ERROR:  new row for relation "accounts" violates check constraint "accounts_balance_check"
+postgres=!# ROLLBACK TO SAVEPOINT sp2;
+ROLLBACK
+postgres=*# INSERT INTO accounts (owner_name, balance) VALUES ('Test3', 300);
+INSERT 0 1
+postgres=*# COMMIT;
+COMMIT
+
+postgres=# -- 6. Error handling via PL/pgSQL
+postgres=# DO $$
+postgres$# DECLARE
+postgres$#     insufficient_funds EXCEPTION;
+postgres$#     current_balance DECIMAL;
+postgres$# BEGIN
+postgres$#     SELECT balance INTO current_balance FROM accounts WHERE account_id = 3;
+postgres$#     IF current_balance < 500 THEN
+postgres$#         RAISE insufficient_funds;
+postgres$#     END IF;
+postgres$#     UPDATE accounts SET balance = balance - 500 WHERE account_id = 3;
+postgres$# EXCEPTION
+postgres$#     WHEN insufficient_funds THEN
+postgres$#         RAISE NOTICE 'Transaction failed: Insufficient funds';
+postgres$# END $$;
+NOTICE:  Transaction failed: Insufficient funds
+DO
+
+postgres=# -- 7. Monitoring Locks
+postgres=# SELECT
+postgres-#     blocked_locks.pid AS blocked_pid,
+postgres-#     blocked_activity.query AS blocked_statement
+postgres-# FROM pg_catalog.pg_locks blocked_locks
+postgres-# JOIN pg_catalog.pg_stat_activity blocked_activity
+postgres-#     ON blocked_activity.pid = blocked_locks.pid
+postgres-# WHERE NOT blocked_locks.granted;
+ blocked_pid | blocked_statement
+-------------+-------------------
+(0 rows)
+
+postgres=# \q
+PS C:\Program Files\PostgreSQL\17\bin>
