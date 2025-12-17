@@ -1,0 +1,107 @@
+PS C:\Users\kubat> cd "C:\Program Files\PostgreSQL\17\bin"
+PS C:\Users\kubat> psql -U postgres
+Password for user postgres:
+
+psql (17.6)
+Type "help" for help.
+
+postgres=# CREATE DATABASE lab17;
+CREATE DATABASE
+
+postgres=# \c lab17
+You are now connected to database "lab17" as user "postgres".
+
+lab17=# DROP TABLE IF EXISTS orders, products, customers, staging_orders CASCADE; [cite: 1, 2]
+DROP TABLE
+
+lab17=# CREATE TABLE customers (
+lab17(#     customer_id SERIAL PRIMARY KEY,
+lab17(#     name VARCHAR(100),
+lab17(#     email VARCHAR(100)
+lab17(# ); [cite: 1]
+CREATE TABLE
+
+lab17=# CREATE TABLE products (
+lab17(#     product_id SERIAL PRIMARY KEY,
+lab17(#     product_name VARCHAR(100),
+lab17(#     price NUMERIC(10,2)
+lab17(# ); [cite: 1]
+CREATE TABLE
+
+lab17=# CREATE TABLE orders (
+lab17(#     order_id SERIAL PRIMARY KEY,
+lab17(#     customer_id INT REFERENCES customers(customer_id),
+lab17(#     product_id INT REFERENCES products(product_id),
+lab17(#     quantity INT,
+lab17(#     order_date DATE DEFAULT CURRENT_DATE
+lab17(# ); [cite: 1]
+CREATE TABLE
+
+lab17=# INSERT INTO customers (name, email) VALUES
+lab17-# ('Aibek', 'aibek@example.com'),
+lab17-# ('Ainura', 'ainura@example.com'),
+lab17-# ('Bakyt', 'bakyt@example.com'); [cite: 1]
+INSERT 0 3
+
+lab17=# INSERT INTO products (product_name, price) VALUES
+lab17-# ('Laptop', 1200.00),
+lab17-# ('Mouse', 25.00),
+lab17-# ('Keyboard', 45.00); [cite: 1]
+INSERT 0 3
+
+lab17=# INSERT INTO orders (customer_id, product_id, quantity, order_date) VALUES
+lab17-# (1, 1, 1, '2024-02-15'),
+lab17-# (2, 3, 2, '2024-03-10'),
+lab17-# (3, 2, 3, '2024-03-12'); [cite: 1]
+INSERT 0 3
+
+lab17=# -- Data Export and Import Tests
+lab17=# COPY customers TO '/tmp/customers.csv' WITH CSV HEADER; [cite: 1]
+COPY 3
+
+lab17=# -- Attempting TRUNCATE with foreign key constraints
+lab17=# TRUNCATE customers; [cite: 1]
+ERROR:  cannot truncate a table referenced in a foreign key constraint
+DETAIL:  Table "orders" references "customers".
+HINT:  Truncate table "orders" at the same time, or use TRUNCATE ... CASCADE.
+
+lab17=# -- Filtered Export
+lab17=# COPY (SELECT name, email FROM customers WHERE name LIKE 'A%')
+lab17-# TO '/tmp/a_customers.csv' WITH CSV HEADER; [cite: 1]
+COPY 2
+
+lab17=# -- Export with Custom Delimiter
+lab17=# COPY products TO '/tmp/products_pipe.txt' WITH CSV HEADER DELIMITER '|' NULL 'N/A'; [cite: 1]
+COPY 3
+
+lab17=# -- Backup and Restore simulation
+lab17=# \q
+PS C:\Program Files\PostgreSQL\17\bin> pg_dump -U postgres -d lab17 -Fc > C:\tmp\lab17.dump
+PS C:\Program Files\PostgreSQL\17\bin> createdb -U postgres lab17_restore
+PS C:\Program Files\PostgreSQL\17\bin> pg_restore -U postgres -d lab17_restore C:\tmp\lab17.dump
+PS C:\Program Files\PostgreSQL\17\bin> psql -U postgres -d lab17_restore -c "SELECT COUNT(*) FROM customers;"
+ count
+-------
+     3
+(1 row)
+
+PS C:\Program Files\PostgreSQL\17\bin> psql -U postgres -d lab17
+lab17=# -- Batch Processing with Staging Table
+lab17=# CREATE TABLE staging_orders AS SELECT * FROM orders WHERE 1=0; [cite: 1]
+SELECT 0
+
+lab17=# COPY (SELECT * FROM orders ORDER BY order_id LIMIT 5)
+lab17-# TO '/tmp/orders_batch.csv' WITH CSV HEADER; [cite: 1]
+COPY 3
+
+lab17=# COPY staging_orders FROM '/tmp/orders_batch.csv' WITH CSV HEADER; [cite: 1]
+COPY 3
+
+lab17=# SELECT COUNT(*) FROM staging_orders; [cite: 1]
+ count
+-------
+     3
+(1 row)
+
+lab17=# \q
+PS C:\Program Files\PostgreSQL\17\bin>
